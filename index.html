@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOCTURNE · 30-minute interactive decks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink-0:#04070e; --ink-1:#0a1120; --ink-2:#101a2e; --ink-3:#18263f; --line:#223353;
+  --txt-1:#eef4ff; --txt-2:#9fb0cc; --txt-3:#63748f;
+  --cyan:#22d3ee; --green:#3dffa0; --magenta:#ff2e88; --violet:#9b7dff; --amber:#ffb020;
+  --fd:"Space Grotesk",system-ui,sans-serif; --fb:"Inter",system-ui,sans-serif; --fm:"JetBrains Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--txt-1); font:400 16px/1.6 var(--fb);
+  background:
+    radial-gradient(1100px 600px at 85% -10%, rgba(155,125,255,.14), transparent 60%),
+    radial-gradient(900px 520px at 0% 108%, rgba(34,211,238,.11), transparent 60%),
+    linear-gradient(180deg,#0b1322 0%,var(--ink-1) 40%,#070d18 100%);
+  background-attachment:fixed; min-height:100vh;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:64px 28px 90px}
+.kicker{font:700 12px var(--fm);letter-spacing:.24em;text-transform:uppercase;color:var(--cyan)}
+h1{font:700 60px/1.04 var(--fd);letter-spacing:-.025em;margin:14px 0 16px}
+h1 span{background:linear-gradient(92deg,var(--cyan),var(--violet) 55%,var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:19px;color:var(--txt-2);max-width:760px;margin:0}
+.lede b{color:var(--txt-1);font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 0}
+.pill{font:600 12.5px var(--fm);color:var(--txt-2);border:1px solid var(--line);background:rgba(16,26,46,.7);border-radius:999px;padding:7px 14px}
+.pill b{color:var(--cyan);font-weight:700}
+h2{font:700 15px var(--fm);letter-spacing:.2em;text-transform:uppercase;color:var(--txt-3);margin:58px 0 18px;display:flex;align-items:center;gap:14px}
+h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.card{
+  display:flex;flex-direction:column;gap:12px;padding:24px 24px 20px;text-decoration:none;color:inherit;
+  background:linear-gradient(180deg,rgba(16,26,46,.92),rgba(10,17,32,.92));
+  border:1px solid var(--line);border-radius:16px;transition:.18s ease;position:relative;overflow:hidden;
+}
+.card::before{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:var(--acc,var(--cyan));opacity:.85}
+.card:hover{transform:translateY(-4px);border-color:var(--acc,var(--cyan));box-shadow:0 22px 50px rgba(0,0,0,.5)}
+.card .no{font:700 13px var(--fm);color:var(--acc,var(--cyan));letter-spacing:.16em}
+.card h3{font:700 25px/1.18 var(--fd);margin:0;letter-spacing:-.015em}
+.card p{margin:0;color:var(--txt-2);font-size:14.5px;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tag{font:600 11px var(--fm);padding:4px 9px;border-radius:6px;border:1px solid var(--line);color:var(--txt-3);letter-spacing:.05em}
+.tag.tool{border-color:rgba(61,255,160,.45);color:var(--green);background:rgba(61,255,160,.08)}
+.tag.dur{border-color:rgba(255,176,32,.45);color:var(--amber);background:rgba(255,176,32,.08)}
+.meta{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:12px;font:600 12.5px var(--fm);color:var(--txt-3)}
+.meta .go{color:var(--acc,var(--cyan))}
+.sect{font-size:13px;color:var(--txt-3);line-height:1.75}
+.sect b{color:var(--txt-2);font-weight:600}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.key{display:flex;gap:14px;align-items:center;padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(16,26,46,.6)}
+kbd{font:700 12px var(--fm);background:var(--ink-3);border:1px solid var(--line);border-bottom-width:2.5px;border-radius:6px;padding:3px 9px;color:var(--txt-1);white-space:nowrap}
+.key span{font-size:14px;color:var(--txt-2)}
+.steps{counter-reset:s;display:grid;gap:14px}
+.step{display:grid;grid-template-columns:44px 1fr;gap:18px;align-items:start;padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:rgba(16,26,46,.55)}
+.step::before{counter-increment:s;content:counter(s);font:700 22px var(--fd);color:var(--violet)}
+.step h4{margin:0 0 4px;font:600 16.5px var(--fd)}
+.step p{margin:0;font-size:14.5px;color:var(--txt-2)}
+code{font:600 .92em var(--fm);color:var(--cyan);background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.22);padding:1px 6px;border-radius:6px}
+.warn{border-left:3px solid var(--amber);background:rgba(255,176,32,.07);padding:14px 18px;border-radius:0 12px 12px 0;font-size:14.5px;color:var(--txt-2)}
+.warn b{color:var(--amber)}
+footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font:500 13px var(--fm);color:var(--txt-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+a.inl{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">interactive presentation kit · nocturne</div>
+  <h1>Five 30-minute talks,<br><span>built on one template</span></h1>
+  <p class="lede">Keyboard-driven slides with <b>live tools inside</b>: VRAM and fine-tune calculators, a tokeniser sandbox, a guardrail you try to beat, an animated agent graph. Speaker notes, a pacing timer, quiz scoring — and a print path that drops the whole deck into Canva.</p>
+  <div class="row">
+    <span class="pill">6 decks · <b>120 slides</b></span>
+    <span class="pill">5 live tools · <b>template/widgets.js</b></span>
+    <span class="pill">zero dependencies · <b>open a file, press ?</b></span>
+    <span class="pill">16:9 · <b>1280 × 720</b></span>
+    <span class="pill">budgeted to <b>28 min + 2</b> for questions</span>
+  </div>
+
+  <h2>The talks</h2>
+  <div class="grid">
+
+    <a class="card" href="decks/01-self-hosting-3090.html" style="--acc:var(--cyan)">
+      <div class="no">01 · SELF-HOSTING</div>
+      <h3>Self-hosting LLMs on one RTX 3090</h3>
+      <p>Engines, weights, quantization, KV cache, context and quality — and the arithmetic that decides what actually fits in 24 GB.</p>
+      <div class="sect"><b>Stops</b> · how inference eats a GPU → weights &amp; quantization → context &amp; KV cache → engine zoo → numbers &amp; gotchas</div>
+      <div class="tags"><span class="tag">vLLM</span><span class="tag">SGLang</span><span class="tag">llama.cpp</span><span class="tag">EXL3</span><span class="tag">GPTQ / AWQ</span><span class="tag tool">◆ vram calculator</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>25 slides</span><span class="go">present →</span></div>
+    </a>
+
+    <a class="card" href="decks/02-fine-tuning.html" style="--acc:var(--green)">
+      <div class="no">02 · FINE-TUNING</div>
+      <h3>Fine-tuning LLMs without a datacenter</h3>
+      <p>What happens in training, how to build the dataset, which engine to pick, and the honest time &amp; GPU math for a 24 GB card.</p>
+      <div class="sect"><b>Stops</b> · how FT works → data is 80% of the job → engines → time &amp; GPU reality → evaluate, merge, serve</div>
+      <div class="tags"><span class="tag">LoRA / QLoRA / DoRA</span><span class="tag">Unsloth</span><span class="tag">AI Toolkit</span><span class="tag">LLaMA-Factory</span><span class="tag tool">◆ fit + time estimator</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>22 slides</span><span class="go">present →</span></div>
+    </a>
+
+    <a class="card" href="decks/03-tokens-specdec-moe.html" style="--acc:var(--violet)">
+      <div class="no">03 · TOKENS → SPEED</div>
+      <h3>The token stack: from characters to speed</h3>
+      <p>Tokenizers (BPE → bytes), speculative decoding (ngram, MTP, EAGLE-3, DFlash / DFlash 2, DSpark) and MoE — the three layers that decide cost, multilingual fairness and tok/s.</p>
+      <div class="sect"><b>Stops</b> · tokenizers → the token tax → speculative decoding → the 2026 draft family → MoE</div>
+      <div class="tags"><span class="tag">BPE / byte-level</span><span class="tag">MTP</span><span class="tag">EAGLE-3</span><span class="tag">DFlash 2</span><span class="tag">DSpark</span><span class="tag">MoE</span><span class="tag tool">◆ token sandbox</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>20 slides</span><span class="go">present →</span></div>
+    </a>
+
+    <a class="card" href="decks/04-red-teaming-llms.html" style="--acc:var(--magenta)">
+      <div class="no">04 · RED-TEAMING</div>
+      <h3>Red-teaming LLMs: break it before someone else does</h3>
+      <p>Method, datasets and questions, expected outcomes — and why the same attack that fails in English succeeds in another language.</p>
+      <div class="sect"><b>Stops</b> · method, not vibes → datasets &amp; scoring → the multilingual gap → garak / promptfoo / PyRIT → the report</div>
+      <div class="tags"><span class="tag">OWASP LLM</span><span class="tag">HarmBench</span><span class="tag">many-shot</span><span class="tag">ASR</span><span class="tag tool">◆ guard simulator</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>20 slides</span><span class="go">present →</span></div>
+    </a>
+
+    <a class="card" href="decks/05-agent-swarms.html" style="--acc:var(--amber)">
+      <div class="no">05 · AGENT SWARMS</div>
+      <h3>Autonomous agent swarms, as graphs</h3>
+      <p>Nodes, edges, shared state, interrupts — a worked deep-research swarm plus the failure modes nobody puts in the demo.</p>
+      <div class="sect"><b>Stops</b> · what a swarm is → configuring with graphs → worked example → composition patterns → failure modes</div>
+      <div class="tags"><span class="tag">LangGraph</span><span class="tag">OpenAI Agents SDK</span><span class="tag">CrewAI</span><span class="tag">MAF</span><span class="tag tool">◆ animated graph run</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>17 slides · runnable example</span><span class="go">present →</span></div>
+    </a>
+
+    <a class="card" href="template/showcase.html" style="--acc:var(--txt-2)">
+      <div class="no">00 · TEMPLATE</div>
+      <h3>Nocturne — layouts &amp; the tool layer</h3>
+      <p>Every layout used by the five decks, plus the widget contract for building new live tools. Start here to author deck 06.</p>
+      <div class="sect"><b>Contents</b> · title / agenda / divider / bullets / tables / code / quote / quiz / poll / tool widgets / end</div>
+      <div class="tags"><span class="tag">deck.css</span><span class="tag">deck.js</span><span class="tag">widgets.js</span><span class="tag tool">◆ live examples</span><span class="tag dur">10 min tour</span></div>
+      <div class="meta"><span>16 slides</span><span class="go">open →</span></div>
+    </a>
+
+  </div>
+
+  <h2>Presenting</h2>
+  <div class="keys">
+    <div class="key"><kbd>→</kbd><span>next fragment, then next slide</span></div>
+    <div class="key"><kbd>←</kbd><span>back (hides builds first)</span></div>
+    <div class="key"><kbd>O</kbd><span>overview grid — jump anywhere</span></div>
+    <div class="key"><kbd>S</kbd><span>speaker notes + time budget</span></div>
+    <div class="key"><kbd>T</kbd> <kbd>R</kbd><span>start / reset the 30-minute timer</span></div>
+    <div class="key"><kbd>F</kbd><span>fullscreen</span></div>
+    <div class="key"><kbd>?</kbd><span>key map</span></div>
+    <div class="key"><kbd>#s7</kbd><span>deep link to a slide (<code>#s7</code>)</span></div>
+  </div>
+  <p class="lede" style="margin-top:20px;font-size:15.5px">Slides build in fragments: press <b>→</b> repeatedly on a bulleted slide. On a tool slide, click the widget first — the arrow keys still navigate.</p>
+
+  <h2>Getting a deck into Canva</h2>
+  <div class="steps">
+    <div class="step"><div><h4>Print the deck to PDF</h4><p>Open the deck in Chrome, <code>⌘/Ctrl + P</code> → <b>Save as PDF</b>, enable <b>Background graphics</b>, margins <b>None</b>. The print stylesheet renders every slide as its own 1280 × 720 page — builds revealed, notes and chrome removed.</p></div></div>
+    <div class="step"><div><h4>Import into Canva</h4><p>Canva → <b>Upload</b> → drop the PDF. Each page becomes an editable slide with live text, so you can restyle, add brand assets or record a voiceover there.</p></div></div>
+    <div class="step"><div><h4>Or export PNGs</h4><p>For image-only import: print each slide at 1280 × 720, or screenshot the stage — <code>node .scratch/verify.js</code> in this folder renders every deck headlessly and writes PNGs to <code>.scratch/shots/</code>.</p></div></div>
+  </div>
+  <div class="warn" style="margin-top:18px"><b>What Canva does not keep:</b> the interactivity. Widgets, quizzes and the timer live in the HTML — present the deck from a browser, and use the Canva version as the leave-behind, the handout or the rehearsal copy. Keep both from the same source so they cannot drift.</div>
+
+  <h2>Files</h2>
+  <div class="sect" style="font-size:14px;line-height:2">
+    <code>decks/</code> the five talks &nbsp;·&nbsp; <code>template/deck.css</code> theme + layouts &nbsp;·&nbsp; <code>template/deck.js</code> navigation, timer, quizzes, widget bootstrap &nbsp;·&nbsp; <code>template/widgets.js</code> the five production tools &nbsp;·&nbsp; <code>template/showcase.html</code> layout + tool-layer reference &nbsp;·&nbsp; <code>research/notes/</code> per-topic research with sources &nbsp;·&nbsp; <code>research/examples/deep_research_swarm.py</code> runnable agent-graph example &nbsp;·&nbsp; <code>README.md</code> authoring guide
+  </div>
+
+  <footer>
+    <span>NOCTURNE · interactive deck kit</span>
+    <span>research notes in <a class="inl" href="research/notes/">research/notes/</a></span>
+    <span>press <kbd>?</kbd> inside any deck</span>
+  </footer>
+</div>
+</body>
+</html>
