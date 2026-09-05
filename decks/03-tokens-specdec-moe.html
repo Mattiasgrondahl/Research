@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tokens, Speculative Decoding &amp; MoE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../template/deck.css">
+</head>
+<body data-brand="TOKENS · SPEED · MOE" data-title="Tokenizers · MTP · DFlash · MoE" data-duration="30">
+<div id="stage">
+
+  <!-- TITLE -->
+  <section class="slide s-title" data-time="0.5">
+    <div class="kicker">30-minute deep dive</div>
+    <h1>The token stack:<br>from characters to <span class="grad-text">speed</span></h1>
+    <p class="sub">Tokenizers (BPE → bytes) · speculative decoding (ngram, MTP, EAGLE, DFlash/2, DSpark) · MoE — three ideas that decide cost, multilingual fairness, and tok/s.</p>
+    <div class="meta"><span>live token sandbox</span><span>2026 draft-model family</span><span>quiz track inside</span></div>
+    <aside class="notes">Arc of the talk: everything about an LLM starts at the token (unit of cost, context, capability) → then how to emit tokens faster than one-at-a-time (speculative decoding family) → then how to change what "one token's worth of compute" means (MoE).</aside>
+  </section>
+
+  <!-- AGENDA -->
+  <section class="slide" data-time="1">
+    <div class="kicker">agenda</div>
+    <h2>30 minutes, three layers</h2>
+    <div class="content" style="margin-top:12px">
+      <div class="ag-row"><div class="n">1</div><div><h3>Tokenizers</h3><p>BPE/WordPiece/Unigram · vocab race · byte fallback · the token tax per language</p></div><span class="min">10 min</span></div>
+      <div class="ag-row"><div class="n">2</div><div><h3>Speculative decoding family</h3><p>ngram/lookup · MTP · EAGLE-3 · DFlash &amp; DFlash 2 · DSpark</p></div><span class="min">10 min</span></div>
+      <div class="ag-row"><div class="n">3</div><div><h3>MoE models</h3><p>experts, routers, active params · serving them on 24 GB</p></div><span class="min">6.5 min</span></div>
+    <small class="src">Slide budgets below total <b>28 min</b> of the 30-minute slot — the rest is your buffer for questions; the timer (T) counts the whole slot.</small>
+    </div>
+    <aside class="notes">These three are one story about efficiency and inequality: tokens decide who pays more per language, drafting decides who waits, MoE decides what fits.</aside>
+  </section>
+
+  <section class="slide s-section" data-section="1 · Tokenizers">
+    <div class="num">01</div>
+    <div class="kicker vio">part one</div>
+    <h2>Tokens: the unit of everything</h2>
+    <p class="sub">Models don't see text. They see token IDs — and that choice has economics.</p>
+    <aside class="notes">≈1.5 min in.</aside>
+  </section>
+
+  <section class="slide" data-time="2.5">
+    <div class="kicker">how vocabularies get built</div>
+    <h2>Three algorithms, same trick</h2>
+    <div class="cols c3" style="margin-top:14px">
+      <div class="card accent-v"><h3>BPE</h3><p class="dim" style="font-size:14px">Start from characters, <b>merge the most frequent pairs</b> until vocab N. GPT-2/3/4 (tiktoken), Llama 2/3.</p></div>
+      <div class="card accent-c"><h3>WordPiece</h3><p class="dim" style="font-size:14px">Like BPE but merges by <b>likelihood gain</b>, adds <code class="tok">##</code>. BERT family.</p></div>
+      <div class="card accent-g"><h3>Unigram</h3><p class="dim" style="font-size:14px">Start huge, <b>prune by loss</b>; probabilistic segmentation. SentencePiece → T5, Gemma, Llama-1.</p></div>
+    </div>
+    <ul class="b" style="margin-top:20px">
+      <li class="frag"><b>Byte-level</b> base (GPT-2, Llama-3): any character representable — no <code class="tok">&lt;unk&gt;</code> death spirals</li>
+      <li class="frag"><b>The vocab race:</b> GPT-2 50k → GPT-4 100k → <b>Llama-3 128,256 · Qwen2.5 151,643 · Gemma 256,000 · GPT-4o 200k</b></li>
+      <li class="frag">Bigger vocab = fewer tokens for CJK/morphology, but bigger embedding tables + rarer (worse-trained) tokens</li>
+    </ul>
+    <aside class="notes">All three converge: frequency-weighted subword compression of a corpus. Vocab sizes from model cards/tiktoken registry. The Tokenizer Paradox (arXiv:2402.06787): bigger vocab isn't monotonically better — rare tokens under-train.</aside>
+  </section>
+
+  <section class="slide" data-time="2.5">
+    <div class="kicker mag">live sandbox</div>
+    <h2>Type anything → watch the token tax</h2>
+    <div data-widget="tok-sandbox" style="margin-top:14px">
+      <noscript><p class="dim">Sandbox needs JavaScript.</p></noscript>
+    </div>
+    <aside class="notes">Heuristic simulation of a modern 100–200k BPE — labeled on-slide. Audience types their own language; pattern they discover: English ~4 chars/token, CJK ~1 token/char, non-Latin scripts fragment. Connect to pricing (you pay per token) and to red-teaming talk: fragmented low-resource tokens ↔ weaker safety transfer.</aside>
+  </section>
+
+  <section class="slide" data-time="2.5">
+    <div class="kicker">the token tax</div>
+    <h2>Every language pays a different price</h2>
+    <div class="content" style="margin-top:12px">
+      <div class="bars">
+        <div class="bar g"><span>English</span><div class="track"><div class="fill" style="--w:22%"></div></div><span class="val">~4.5 ch/tok</span></div>
+        <div class="bar"><span>German</span><div class="track"><div class="fill" style="--w:30%"></div></div><span class="val">~3.3</span></div>
+        <div class="bar a"><span>Japanese (cl100k)</span><div class="track"><div class="fill" style="--w:62%"></div></div><span class="val">~1.6</span></div>
+        <div class="bar m"><span>Zulu / Yoruba / Lao</span><div class="track"><div class="fill" style="--w:80%"></div></div><span class="val">~1.2</span></div>
+      </div>
+      <div class="cols c2" style="margin-top:20px">
+        <ul class="b compact">
+          <li>Same sentence, <b>2–5× the tokens</b> depending on language → 2–5× cost &amp; latency, less context per window.</li>
+          <li>GPT-4o's o200k tokenizer cut Japanese token counts ~<b>⅓</b> vs cl100k; Llama-3's 128k claimed ~15% multilingual cost cut vs Llama-2 (jsvine analysis, Meta model card).</li>
+        </ul>
+        <ul class="b compact">
+          <li><b>Artifacts are learned scars:</b> digit-splitting hurt arithmetic; Llama-3 forces per-digit numbers, Qwen groups them.</li>
+          <li>"strawberry" misspelling failures = tokenization + under-trained rare tokens.</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">chars/token figures are approximate averages from published tokenizer stats (jsvine GPT-4o post, Common Crawl token studies) — say "order of magnitude". The economic framing: a Japanese user literally pays more per word for the same model.</aside>
+  </section>
+
+  <section class="slide" data-time="1.5">
+    <div class="kicker vio">the byte-level rebellion</div>
+    <h2>What if we skipped tokenization?</h2>
+    <div class="cols c2" style="margin-top:12px">
+      <div>
+        <ul class="b">
+          <li class="frag"><b>Mamba char models</b> — plain bytes in, no vocab.</li>
+          <li class="frag"><b>BLT — Byte Latent Transformer</b> (Meta, arXiv:2412.09871): dynamic <em>byte patches</em> chosen by local entropy; Pareto-beats BPE models at same FLOPs; language-agnostic by construction.</li>
+          <li class="frag"><b>NexusAI Flash</b> (2025): byte-based edge model — "end of tokenization" marketing.</li>
+        </ul>
+      </div>
+      <div class="card accent-a"><h3>Why BPE still wins (for now)</h3><ul class="b compact"><li>bytes = 2–4× longer sequences → attention &amp; KV cost explodes</li><li>tokenizer is one-time; a bad one taxes forever</li><li>Hybrid/adaptive patching is the likely middle path</li></ul></div>
+    </div>
+    <div class="callout" style="margin-top:14px">Practical rule: <b>check the tokenizer before blaming the model</b> — multilingual quality complaints often end at vocabulary, not weights.</div>
+    <aside class="notes">Byte-level models also dodge the "tokenizer mismatch" mess in model families (Llama-2→3 changed vocab; caches/templates broke). Watch adaptive-patching (BLT) as the research frontier.</aside>
+  </section>
+
+  <section class="slide" data-time="1">
+    <div class="quiz" data-answer="c" data-qid="q-tok">
+      <div class="q">A Japanese support bot on GPT-3.5 (cl100k) costs ~2.5× the English equivalent per conversation. Cheapest structural fix?</div>
+      <button class="q-opt">Train a 50k Japanese-only tokenizer on the fly</button>
+      <button class="q-opt">Nothing — token costs are fixed physics</button>
+      <button class="q-opt">Move to a model/tokenizer with better JA coverage (o200k-class or CJK-heavy vocabs like Qwen)</button>
+      <button class="q-opt">Quantize to 4-bit</button>
+      <div class="q-why">Tokenizer choice is a deployment decision. o200k cut Japanese ~30%+ vs cl100k; Qwen/Gemma (151k/256k) are CJK-friendlier. Quantization (D) changes memory, not token counts.</div>
+    </div>
+    <aside class="notes">Quiz. The "physics" trap is tempting — but vocab choice halves the tax with zero model retraining.</aside>
+  </section>
+
+  <section class="slide s-section" data-section="2 · Speculative decoding">
+    <div class="num">02</div>
+    <div class="kicker grn">part two</div>
+    <h2>Speculative decoding</h2>
+    <p class="sub">Guess several tokens, verify in one pass. The 2–6× speed lever — and a whole family of "who guesses".</p>
+    <aside class="notes">≈10 min in. Callback to Talk 01: decode is bandwidth-bound; compute idles → let something cheap fill it with guesses.</aside>
+  </section>
+
+  <section class="slide" data-time="2">
+    <div class="kicker">the core trick</div>
+    <h2>Draft → verify → keep the prefix you like</h2>
+    <div class="cols c2" style="margin-top:12px">
+      <div>
+        <ul class="b">
+          <li class="frag">Draft model proposes γ next tokens (cheap).</li>
+          <li class="frag">Target model checks them in <b>one parallel pass</b> (the slack compute).</li>
+          <li class="frag">Accept the longest matching prefix, reject the rest — with rejection sampling, output is <b>mathematically identical</b> to the target alone. Lossless.</li>
+          <li class="frag">Speedup ≈ <code class="tok">(1−α^{γ+1}) / ((1−α)(γc+1))</code> — α=accept rate, c=draft cost ratio.</li>
+          <li class="frag">α ≈ 0.7–0.8, γ 4–8 → <b>2–3.6×</b> typical; the game is maximizing α per extra GB.</li>
+        </ul>
+      </div>
+      <div>
+        <p class="codecap">one decode step, speculative</p>
+        <pre class="code">target so far: <span class="s">"The capital of France is"</span>
+draft proposes:  <span class="v">" Paris" " in" " Europe"</span>
+
+target verifies all 3 in <span class="k">one</span> forward pass:
+  <span class="s">" Paris"</span>  ✓ accept
+  <span class="s">" in"</span>     ✗ reject → stop here
+  (<span class="s">" Europe"</span> skipped; bonus token sampled)
+
+→ 2+ real tokens for the price of 1 pass</pre>
+        <p class="mut" style="font-size:12.5px;margin-top:8px">Leviathan et al. arXiv:2211.17192; Chen et al. 2302.01318</p>
+      </div>
+    </div>
+    <aside class="notes">Stress "lossless": temperature and all, distribution-preserving — spec decode is free correctness-wise, which is why every engine shipped it. The draft source is the design axis → next slide family tree.</aside>
+  </section>
+
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">the family tree</div>
+    <h2>Who drafts? Four answers</h2>
+    <div class="flow" style="margin-top:20px">
+      <div class="fnode c" style="max-width:210px">Separate draft LLM<small>classic 2022 · STANDALONE</small></div><div class="farr">→</div>
+      <div class="fnode v" style="max-width:210px">Extra heads / features<small>Medusa · <b>MTP</b> · EAGLE-3</small></div><div class="farr">→</div>
+      <div class="fnode a" style="max-width:210px">The context itself<small><b>ngram</b> / prompt-lookup / REST</small></div><div class="farr">→</div>
+      <div class="fnode m" style="max-width:210px">Parallel diffusion<small><b>DFlash → DFlash 2 → DSpark</b></small></div>
+    </div>
+    <table class="t sm" style="margin-top:26px">
+      <thead><tr><th></th><th>Draft cost</th><th>Extra VRAM</th><th>Best at</th><th>Engine support</th></tr></thead>
+      <tbody>
+        <tr><td>Ngram / lookup</td><td>≈0 (CPU hash/suffix match)</td><td class="ok">0 GB</td><td>copy-heavy: RAG, agents, code, repetition</td><td class="ok">SGLang NGRAM · llama.cpp draft-ngram · vLLM prompt_lookup</td></tr>
+        <tr><td>MTP</td><td>one small head pass</td><td class="ok">0.5–1B params</td><td>models trained with it (DeepSeek, Gemma-3n, Qwen3-Next)</td><td class="ok">native in SGLang/vLLM/MLX</td></tr>
+        <tr><td>EAGLE-3</td><td>feature-draft net</td><td>~1 GB</td><td>general text — current quality king</td><td class="ok">SGLang/vLLM; official checkpoints</td></tr>
+        <tr class="hl-best"><td>DFlash/DSpark</td><td>block diffusion, one-shot</td><td>~1–2.5 GB</td><td>long accepted blocks → biggest wins</td><td>SGLang DFLASH; vLLM PRs; llama.cpp fork</td></tr>
+      </tbody>
+    </table>
+    <aside class="notes">Frame as a 4-generation story: external model (expensive VRAM) → heads bolted on (MTP: "free draft" if trained in) → zero-model retrieval (ngram: genius for copy-tasks) → diffusion blocks (DFlash/DSpark: draft 8–16 tokens in ONE forward pass instead of autoregressively).</aside>
+  </section>
+
+  <section class="slide" data-time="1.5">
+    <div class="kicker">ngram · the free lunch</div>
+    <h2>Drafting from the future's memory</h2>
+    <div class="cols c2" style="margin-top:12px">
+      <div>
+        <ul class="b">
+          <li>Keep a suffix structure (hash/automaton) of <b>everything in context</b>; when generating, look up the last n tokens, propose whatever followed them last time.</li>
+          <li>Cost: microseconds on CPU. <b>Zero weights, zero VRAM.</b></li>
+          <li>Wins when output copies input: <b>RAG answers, summarization, agents re-emitting tool output, code completion, JSON boilerplate, user repeats themselves.</b></li>
+          <li>Useless on novel prose (α≈0) — and there it costs nothing. REST (arXiv:2311.08252) extends the draft source to an external corpus.</li>
+        </ul>
+      </div>
+      <div>
+        <p class="codecap">SGLang — zero extra model</p>
+        <pre class="code">python -m sglang.launch_server \
+  --model-path <span class="s">Qwen/Qwen2.5-14B-Instruct</span> \
+  --speculative-algorithm <span class="p">NGRAM</span> \
+  --speculative-num-draft-tokens <span class="n">64</span>
+
+<span class="cm"># llama.cpp equivalent:</span>
+llama-server -m model.gguf \
+  --spec-type <span class="p">draft-ngram</span> -ot <span class="p">ngram=4</span>
+
+<span class="cm"># vLLM: prompt_lookup (ngram) method</span></pre>
+        <p class="mut" style="font-size:12.5px;margin-top:6px">SGLang docs: speculative_decoding (fetched 2026)</p>
+      </div>
+    </div>
+    <aside class="notes">The sleeper feature of the deck: on agent workloads (context re-reads, tool JSON echo), ngram gives real speedups for free. In SGLang it's CUDA-only and disables overlap scheduler — mention tradeoff. For agent swarms talk: this is why agent frameworks get 1.5-3× "for free" in production.</aside>
+  </section>
+
+  <section class="slide" data-time="2">
+    <div class="kicker grn">MTP · trained-in prediction</div>
+    <h2>Multi-token prediction: a head for tomorrow, today</h2>
+    <div class="cols c2" style="margin-top:12px">
+      <div>
+        <ul class="b">
+          <li class="frag"><b>Pretrain with extra prediction targets</b>: besides t+1, also t+2… → tiny extra module learns to look ahead.</li>
+          <li class="frag"><b>DeepSeek-V3</b>: one sequential MTP module beyond the backbone; auxiliary loss λ=0.3 <em>also improves the main head</em>; used speculatively at <b>~90% acceptance → +1.8× throughput</b> (paper).</li>
+          <li class="frag">Now shipping in: DeepSeek-V3/R1, <b>Gemma-3n</b>, Qwen3-Next, several 2025-26 open models — the "draft included in the weights" trend.</li>
+          <li class="frag">Bonus: MTP training signal = richer gradient → better data efficiency (Meta's MTP work, arXiv:2404.19737: up to 3× on coding/math).</li>
+        </ul>
+      </div>
+      <div>
+        <p class="codecap">MTP as speculative decoding</p>
+        <pre class="code"><span class="cm"># SGLang — draft is the model's own head</span>
+python -m sglang.launch_server \
+  --model-path <span class="s">deepseek-ai/DeepSeek-V3</span> \
+  --speculative-algorithm <span class="p">EAGLE</span> \
+  --speculative-num-steps <span class="n">1</span> \
+  --speculative-eagle-topk <span class="n">1</span> \
+  --speculative-num-draft-tokens <span class="n">2</span>
+<span class="cm"># small k is correct: MTP accepts ~90% at 1</span>
+
+<span class="cm"># vs EAGLE-3 (external feature-draft net):</span>
+--speculative-algorithm <span class="p">EAGLE3</span> \
+--speculative-draft-model-path <span class="s">…/eagle3-…</span></pre>
+      </div>
+    </div>
+    <aside class="notes">MTP vs EAGLE: MTP trained WITH the model (weight synergy, no extra download, fixed depth 1); EAGLE added AFTER training (any model, tunable depth/tree). SGLang numbers: Llama-3.1-8B MT-Bench on H100: 158 → EAGLE-2 244 → EAGLE-3 373 tok/s (docs). DeepSeek: 1.8× at ~90% accept.</aside>
+  </section>
+
+  <section class="slide" data-time="2">
+    <div class="kicker grn">2026 frontier</div>
+    <h2>DFlash → DFlash 2 → DSpark: diffusion drafts</h2>
+    <div class="cols c2" style="margin-top:12px">
+      <div>
+        <ul class="b">
+          <li class="frag"><b>DFlash</b> (arXiv:2602.06036, z-lab): a tiny <b>block-diffusion</b> draft model — unrolls a whole 16-token block in <b>one parallel pass</b>, conditioned on target hidden states.</li>
+          <li class="frag">Where EAGLE autoregresses its draft (7 sequential micro-steps), DFlash emits the block at once → accepted length up, wall-clock draft cost down → <b>&gt;4× class speedups</b> reported on Qwen3/Gemma class models.</li>
+          <li class="frag"><b>DFlash 2</b> (inco.ai, HF z-lab): upgraded system; first ckpts: Muse-Glimmer-30B, Qwen3.8-27B.</li>
+          <li class="frag"><b>DSpark</b> (DeepSeek, arXiv:2607.05147, DeepSpec repo): block-7 drafts trained against cached target outputs; <b>official EAGLE-3 / DFlash / DSpark checkpoint triplets</b> for Qwen3-4/8/14B + Gemma-4-12B; eval suite: gsm8k…arena-hard-v2 acceptance.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card accent-g"><h3>Why it matters on a 3090</h3>
+          <ul class="b compact">
+            <li>draft = ~1–2.5 GB on top — fits where 70B doesn't</li>
+            <li>one-shot blocks = less kernel-launch churn (consumer GPUs love it)</li>
+            <li>SGLang: <code class="tok">--speculative-algorithm DFLASH --speculative-draft-model-path …</code></li>
+            <li>tradeoff: needs pp_size=1, no dp-attention, overlap off (docs)</li>
+          </ul>
+        </div>
+        <p class="mut" style="font-size:12.5px;margin-top:10px">sources: local .scratch/dflash_readme.md, dspark_readme.md; SGLang spec-decode docs.</p>
+      </div>
+    </div>
+    <aside class="notes">Diffsusion drafting = the "MLLM moment" for spec decode: non-autoregressive drafters got good enough that parallel block proposals beat autoregressive drafting end-to-end. DSpark is DeepSeek's take + open training stack (DeepSpec) — note the 38 TB target-cache warning, this is serious infra.</aside>
+  </section>
+
+  <section class="slide" data-time="1">
+    <div class="quiz" data-answer="b" data-qid="q-spec">
+      <div class="q">Your agent framework re-sends the same 8k system+tools context on every step and echoes large chunks of tool JSON into its answer. Which draft source gives the best speedup-per-GB?</div>
+      <button class="q-opt">EAGLE-3 draft net (~1 GB)</button>
+      <button class="q-opt">NGRAM/prompt-lookup — the answer tokens literally appear in the context</button>
+      <button class="q-opt">DFlash block-diffusion (~2 GB)</button>
+      <button class="q-opt">Larger GPU</button>
+      <div class="q-why">Copy-heavy workloads are ngram's home turf: α stays high because drafts are retrieved from the context itself — at 0 extra GB and 0 extra weights. EAGLE/DFlash then add on top for the novel parts.</div>
+    </div>
+    <aside class="notes">Ties to the agent-swarm talk: ngram is why agent traffic benefits disproportionately. Modern stacks mix: ngram for retrieval stretches + model-based draft elsewhere.</aside>
+  </section>
+
+  <section class="slide s-section" data-section="3 · MoE">
+    <div class="num">03</div>
+    <div class="kicker a" style="color:var(--amber)">part three</div>
+    <h2>MoE models</h2>
+    <p class="sub">The cheat code for "huge model, small step": activate a fraction of experts per token.</p>
+    <aside class="notes">≈23 min in.</aside>
+  </section>
+
+  <section class="slide" data-time="3">
+    <div class="kicker amb">how MoE works</div>
+    <h2>A panel of experts, a router per token</h2>
+    <div class="flow" style="margin-top:16px">
+      <div class="fnode c">hidden state</div><div class="farr">→</div>
+      <div class="fnode v">Router<small>tiny gate: pick k experts</small></div><div class="farr">→</div>
+      <div class="fnode g" style="max-width:230px">Expert 17 + Expert 203 + shared<small>their FFN weights fire</small></div><div class="farr">→</div>
+      <div class="fnode">weighted sum<small>→ next layer</small></div>
+    </div>
+    <table class="t sm" style="margin-top:18px">
+      <thead><tr><th>Model</th><th>Total params</th><th>Active / token</th><th>Ratio</th><th>Q4 GGUF size</th></tr></thead>
+      <tbody>
+        <tr><td>Mixtral 8x7B (2023)</td><td>47B</td><td>13B</td><td>2.8×</td><td>~27 GB</td></tr>
+        <tr class="hl-best"><td>Qwen3-30B-A3B</td><td>30.5B</td><td>3.3B</td><td>9×</td><td>~17–18 GB — <b>fits a 3090</b></td></tr>
+        <tr><td>DeepSeek-V3</td><td>671B</td><td>37B (+3 shared MLA)</td><td>18×</td><td>~55 GB → dual-GPU / KTransformers CPU-experts</td></tr>
+        <tr><td>Kimi K2.5</td><td>~1T</td><td>~32B</td><td>30×</td><td>datacenter</td></tr>
+      </tbody>
+    </table>
+    <div class="cols c2" style="margin-top:16px">
+      <div class="callout grn"><b>Decode reads only active params</b> → a 30B-A3B generates like a ~3B dense (fast!) at a ~30B quality class. MoE × speculative decoding compounds the win.</div>
+      <div class="callout amb"><b>But all experts must live somewhere:</b> VRAM or CPU-RAM (offload: llama.cpp <code class="tok">--n-cpu-moe</code>, KTransformers runs 671B on 24 GB + 384 GB RAM at usable speed).</div>
+    </div>
+    <aside class="notes">Fine-grained experts (DeepSeek: 256 tiny experts, k=8 routed +1 shared) beat 8 fat experts — better specialization + smoother load. Aux load-balancing loss keeps routers honest. MoE quirk: routing changes can flip answers between quant builds — cite DeepSeek router stability discussions.</aside>
+  </section>
+
+  <section class="slide" data-time="1.5">
+    <div class="kicker amb">moe × tokens × speed</div>
+    <h2>How the three layers of this talk interlock</h2>
+    <div class="content" style="margin-top:12px">
+      <ul class="b">
+        <li class="frag"><b>MoE + tokens:</b> fewer active params per token × fewer tokens (better tokenizer) = the two multiplicative ways to make inference cheap.</li>
+        <li class="frag"><b>MoE + drafting:</b> cheap decode leaves more headroom for verification — DFlash/EAGLE acceptance gains are larger on MoE serving (DeepSeek's own stack uses MTP + MLA).</li>
+        <li class="frag"><b>MLA</b> (DeepSeek's compressed KV): ~70 KB/token — MoE's storage-side partner; dense attention models pay 2–20× more per token.</li>
+        <li class="frag"><b>Training tax:</b> MoE needs load-balancing tricks, is less stable to fine-tune (expert drift), and 4-bit quantized MoE has more per-expert error to manage — the price of the cheat code.</li>
+      </ul>
+    </div>
+    <aside class="notes">This slide earns the deck's title "the token stack". End with it: efficiency is multiplicative across all three layers; the frontier (DeepSeek line) pushes all three at once.</aside>
+  </section>
+
+  <section class="slide" data-time="1">
+    <div class="quiz" data-answer="a" data-qid="q-moe">
+      <div class="q">Why can a single 24 GB RTX 3090 generate from Qwen3-30B-A3B at ~25–40 tok/s but barely runs Qwen2.5-32B (dense, same size) at ~10–15?</div>
+      <button class="q-opt">Decode reads ~3B active params, not 30B — bandwidth cost follows active weights</button>
+      <button class="q-opt">MoE models have smaller KV caches by definition</button>
+      <button class="q-opt">The 3090 has more CUDA cores than needed for dense models</button>
+      <button class="q-opt">GGUF only quantizes experts</button>
+      <div class="q-why">Generation speed ≈ bandwidth ÷ bytes-read; MoE reads a ~3B-parameter slice per token. (KV is per-layer full-width though — MoE doesn't shrink attention, that's MLA's job.)</div>
+    </div>
+    <aside class="notes">Final quiz — closes the loop to Talk 01's bandwidth equation. Q4 30B-A3B ≈ 17-18 GB also fits fully on-card: no offload tax.</aside>
+  </section>
+
+  <section class="slide" data-time="1">
+    <div class="kicker grn">recap</div>
+    <h2>Five things to remember</h2>
+    <div class="content" style="margin-top:12px">
+      <ul class="b">
+        <li><b>Tokens are an economic choice</b> — vocab race (50k→256k) cut multilingual taxes; always check the tokenizer before blaming the model.</li>
+        <li><b>Spec decode is lossless free speed</b>: draft-then-verify; the game is α (acceptance) per extra GB.</li>
+        <li><b>Four drafters:</b> ngram (0 GB, copy-god) · MTP (trained-in head, ~90% α) · EAGLE-3 (best general) · DFlash/DSpark (parallel diffusion blocks, &gt;4×).</li>
+        <li><b>MoE = quality on a bandwidth diet</b>: 9–30× active/total ratio; VRAM still needs the whole model — offload or MLA to fit.</li>
+        <li><b>The frontier is multiplicative</b>: tokenizer × drafting × MoE(+MLA) — efficiency stacks.</li>
+      </ul>
+      <div class="chiprow" style="margin-top:18px"><span class="chip">quiz score: <b data-score>–</b></span><span class="chip c">tiktoken</span><span class="chip c">SGLang spec-decode docs</span><span class="chip c">DeepSpec/DSpark</span><span class="chip c">z-lab DFlash</span></div>
+    </div>
+    <aside class="notes">Sources: research/notes/tokenizer-foundations.md, spec-decoding.md (+ local dflash/dspark readmes, SGLang docs).</aside>
+  </section>
+
+</div>
+<script>
+/* ---- token sandbox widget (heuristic BPE simulation) ---- */
+window.DeckWidgets = window.DeckWidgets || {};
+window.DeckWidgets["tok-sandbox"] = function (el) {
+  var WORDS = {}; ("the a an and or of to in is are was were be been it this that for with on at as by from you your we our they their he she his her i my me not but if then than so can will just about into over under out up down what when where who how why all any some one two three time year people way world life day hand part child eye woman place work week case company number group problem fact money way world state book music night market family food student power city country story art lot right study book word eye job place work now year way thing man woman child student person day thing world life hand part place case week company number group system program question government net company number fact money story fact month lot book eye job word business issue side kind head house service friend father hour line end member law car city name team minute idea body question rock material paper study tool fire property food sound voice glass win skill any life own tell become drive design follow act keep support view stand create speak read let add spend grow open walk offer remember love consider appear buy wait serve die send expect build stay fall cut reach kill remain suggest raise pass sell require report decide pull develop return explain increase train relate identify lay hold see use help try need feel leave put mean seem give find know think want make like go do say get").split(" ").forEach(function (w) { WORDS[w] = 1; });
+  function isCJK(c) { return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af]/.test(c); }
+  function tokenize(text) {
+    var out = [], i = 0;
+    while (i < text.length) {
+      var c = text[i];
+      if (/\s/.test(c)) { var j = i; while (j < text.length && /\s/.test(text[j])) j++; out.push({ t: text.slice(i, j), k: "ws" }); i = j; continue; }
+      if (isCJK(c)) { out.push({ t: c, k: "cjk" }); i++; continue; }
+      if (/[A-Za-z']/.test(c)) {
+        var j2 = i; while (j2 < text.length && /[A-Za-z']/.test(text[j2])) j2++;
+        var word = text.slice(i, j2);
+        var w = word.toLowerCase();
+        if (WORDS[w]) { out.push({ t: word, k: "word" }); }
+        else {
+          // chunk: ~3.5 chars per token for long/uncommon latin words
+          for (var p = 0; p < word.length;) { var n = word.length - p > 4 ? (Math.random() < .5 ? 3 : 4) : (word.length - p); out.push({ t: word.substr(p, n), k: p === 0 ? "sub" : "sub2" }); p += n; }
+        }
+        i = j2; continue;
+      }
+      if (/[0-9]/.test(c)) { var j3 = i; while (j3 < text.length && /[0-9.,]/.test(text[j3])) j3++; var num = text.slice(i, j3); for (var q2 = 0; q2 < num.length; q2 += 3) out.push({ t: num.substr(q2, 3), k: "num" }); i = j3; continue; }
+      var j4 = i; while (j4 < text.length && !/\s|[A-Za-z']/.test(text[j4]) && !isCJK(text[j4]) && !/[0-9]/.test(text[j4])) j4++;
+      out.push({ t: text.slice(i, Math.max(j4, i + 1)), k: "punct" }); i = Math.max(j4, i + 1);
+    }
+    return out;
+  }
+  var PRESETS = {
+    "English": "The quick brown fox jumps over the lazy dog.",
+    "Deutsch": "Die Geschwindigkeitsbegrenzung beträgt fünfzig Kilometer pro Stunde.",
+    "日本語": "人工知能の未来について一緒に考えましょう。",
+    "中文": "大语言模型的下一个瓶颈是效率而不是规模。",
+    "strawberry": "How many r's in strawberry?",
+    "code": "def fibonacci(n): return [0,1] if n<2 else fibonacci(n-1)+[fibonacci(n-1)[-1]+fibonacci(n-2)[-1]]"
+  };
+  el.innerHTML =
+    '<div style="margin-bottom:12px" class="chiprow" id="ts-presets"></div>' +
+    '<textarea class="pbox" id="ts-in" rows="2" spellcheck="false">The quick brown fox jumps over the lazy dog.</textarea>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px">' +
+    '  <div class="codecap" style="margin:0">simulated modern-BPE tokens</div>' +
+    '  <div style="font:700 15px var(--font-mono)" id="ts-count"></div>' +
+    '</div>' +
+    '<div class="toks" id="ts-out" style="min-height:88px"></div>' +
+    '<p class="mut" style="font-size:12px;margin-top:10px">Heuristic simulation of a 100–200k BPE (real splits differ; ratios match published multilingual stats). CJK shown violet, sub-word fragments cyan, unknown-script bytes pink.</p>';
+  var inp = el.querySelector("#ts-in"), out = el.querySelector("#ts-out"), cnt = el.querySelector("#ts-count");
+  var pre = el.querySelector("#ts-presets");
+  Object.keys(PRESETS).forEach(function (k) {
+    var b = document.createElement("button"); b.className = "chip"; b.style.cursor = "pointer"; b.textContent = k;
+    b.addEventListener("click", function () { inp.value = PRESETS[k]; run(); });
+    pre.appendChild(b);
+  });
+  function run() {
+    var toks = tokenize(inp.value);
+    out.innerHTML = "";
+    toks.forEach(function (t, idx) {
+      if (t.k === "ws") return;
+      var s = document.createElement("span");
+      s.className = "tk" + (t.k === "cjk" ? " cjk" : t.k === "sub2" ? " byte" : "");
+      s.style.animationDelay = Math.min(idx * 18, 400) + "ms";
+      s.textContent = t.t;
+      out.appendChild(s);
+    });
+    var chars = inp.value.replace(/\s/g, "").length;
+    cnt.innerHTML = '<span class="hl">' + toks.filter(function (t) { return t.k !== "ws"; }).length + " tokens</span> · " + chars + " chars · <span class=\"dim\">" + (chars ? (chars / toks.length).toFixed(1) : "0") + " chars/token</span>";
+  }
+  inp.addEventListener("input", run); run();
+};
+</script>
+<script src="../template/widgets.js"></script>
+<script src="../template/deck.js"></script>
+</body>
+</html>
