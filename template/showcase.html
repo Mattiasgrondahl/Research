@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOCTURNE — Interactive Deck Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="deck.css">
+</head>
+<body data-brand="NOCTURNE · TEMPLATE" data-title="NOCTURNE Template" data-duration="10">
+<div id="stage">
+
+  <!-- 1 · TITLE -->
+  <section class="slide s-title">
+    <div class="kicker">interactive presentation template</div>
+    <h1>Nocturne<br><span class="grad-text">Deck Template</span></h1>
+    <p class="sub">A Canva-ready system for 30-minute technical talks: keyboard-driven slides, live quizzes, calculators, demos, speaker notes, pacing timer — and a PDF/PPTX path into Canva.</p>
+    <div class="meta"><span>16:9 canvas</span><span>zero dependencies</span><span>press <b>?</b> for help</span></div>
+    <aside class="notes">Welcome. This file is the template — every deck in this kit (01–05) is built from these same layouts. Press ? to show the key map, T to start the 30-minute pacing timer, S for speaker notes, O for the slide overview.</aside>
+  </section>
+
+  <!-- 2 · AGENDA -->
+  <section class="slide" data-time="1">
+    <div class="kicker">agenda layout</div>
+    <h2>What a 30-minute talk looks like</h2>
+    <div class="content" style="margin-top:14px">
+      <div class="ag-row"><div class="n">1</div><div><h3>Hook &amp; why it matters</h3><p>One number that reframes the room</p></div><span class="min">3 min</span></div>
+      <div class="ag-row"><div class="n">2</div><div><h3>Mechanics — how it actually works</h3><p>Diagrams, code, live widgets</p></div><span class="min">12 min</span></div>
+      <div class="ag-row"><div class="n">3</div><div><h3>Hands-on interactions</h3><p>Quizzes &amp; calculator built from components</p></div><span class="min">8 min</span></div>
+      <div class="ag-row"><div class="n">4</div><div><h3>Patterns, pitfalls &amp; recap</h3><p>What to remember Monday morning</p></div><span class="min">7 min</span></div>
+    </div>
+    <aside class="notes">The agenda layout: .ag-row per section with a data-time badge. Keep to 4–5 rows; the timer (T) counts down from the body's data-duration.</aside>
+  </section>
+
+  <!-- 3 · SECTION DIVIDER -->
+  <section class="slide s-section">
+    <div class="num">02</div>
+    <div class="kicker grn">section divider layout</div>
+    <h2>Mechanics</h2>
+    <p class="sub">Use dividers to mark the timer's checkpoints — the notes panel shows cumulative minutes.</p>
+    <aside class="notes">Section dividers register as "sections" in the HUD and overview. Keep one per agenda block.</aside>
+  </section>
+
+  <!-- 4 · BULLETS + CALLOUT -->
+  <section class="slide" data-time="1">
+    <div class="kicker">bullets layout</div>
+    <h2>Content slides carry the argument</h2>
+    <div class="content" style="margin-top:12px">
+      <ul class="b">
+        <li class="frag">One idea per slide; the title states the <b>conclusion</b>, not the topic</li>
+        <li class="frag"><span class="hl">Fragments</span> — this bullet fades in on <kbd>→</kbd> before the slide advances</li>
+        <li class="frag"><span class="hl-v">Color semantics</span>: cyan = info · green = good · magenta = risk · amber = cost/time</li>
+        <li class="frag">Sources live in the footer slot — always cite numbers</li>
+      </ul>
+      <div class="callout" style="margin-top:16px">💡 The <code class="tok">.frag</code> class turns any element into a build step. Presenter clicks →; fragments first, then the slide.</div>
+    </div>
+    <aside class="notes">Demo the fragments: press → repeatedly. Each <li class="frag"> reveals one at a time; only after the last fragment does → move to the next slide.</aside>
+  </section>
+
+  <!-- 5 · TWO-COLUMN CARDS -->
+  <section class="slide" data-time="1">
+    <div class="kicker vio">two-column layout</div>
+    <h2>Cards for A/B contrasts</h2>
+    <div class="cols c2" style="margin-top:14px">
+      <div class="card accent-g">
+        <h3><span class="ico">✅</span> Do</h3>
+        <ul class="b compact">
+          <li>Titles as full sentences</li>
+          <li>One chart per insight</li>
+          <li>Live widgets every ~5 minutes</li>
+        </ul>
+      </div>
+      <div class="card accent-m">
+        <h3><span class="ico">🚫</span> Don't</h3>
+        <ul class="b compact">
+          <li>Paragraph dumps</li>
+          <li>Dashboards with 6 charts</li>
+          <li>Interaction after minute 20</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">.cols.c2 / .c3 / .c21 / .c12 grid helpers; .card.accent-* for colored borders.</aside>
+  </section>
+
+  <!-- 6 · TABLE -->
+  <section class="slide" data-time="1">
+    <div class="kicker">table layout</div>
+    <h2>Tables with verdicts</h2>
+    <div class="content" style="margin-top:14px">
+      <table class="t">
+        <thead><tr><th>Component</th><th>Quant-safe?</th><th>Scales with context</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Weights (Q4)</td><td class="mid">mostly</td><td class="no">no</td><td>4-bit ≈ +0.1–0.4 perplexity, fine for chat</td></tr>
+          <tr><td>KV cache</td><td class="mid">q8 yes / q4 risky</td><td class="no">yes — linear</td><td>quantized KV hurts needle-in-haystack</td></tr>
+          <tr class="hl-best"><td>Activations</td><td class="ok">yes</td><td class="ok">no</td><td>fp8 free on H100, absent on 3090</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <aside class="notes">.t table, .ok/.mid/.no verdict chips as text classes, hl-best/hl-warn row tints.</aside>
+  </section>
+
+  <!-- 7 · STATS + BARS -->
+  <section class="slide" data-time="1">
+    <div class="kicker amb">data layouts</div>
+    <h2>Big numbers &amp; bar charts</h2>
+    <div class="stats" style="margin-top:18px">
+      <div class="stat"><div class="v">3.1×</div><div class="l">headline metric — one stat per column</div></div>
+      <div class="stat g"><div class="v">74%</div><div class="l">green for good</div></div>
+      <div class="stat m"><div class="v">42 ms</div><div class="l">magenta for risk/latency</div></div>
+      <div class="stat a"><div class="v">$128</div><div class="l">amber for cost</div></div>
+    </div>
+    <div class="bars" style="margin-top:26px">
+      <div class="bar"><span>Baseline</span><div class="track"><div class="fill" style="--w:100%"></div></div><span class="val">158 t/s</span></div>
+      <div class="bar g"><span>Optimized</span><div class="track"><div class="fill" style="--w:154%"></div></div><span class="val">244 t/s</span></div>
+      <div class="bar v"><span>Optimized+</span><div class="track"><div class="fill" style="--w:236%"></div></div><span class="val">373 t/s</span></div>
+    </div>
+    <aside class="notes">.stats grid for hero numbers; .bars animate on slide entry using --w custom property (values can exceed 100% — clamp visually in the deck or normalize).</aside>
+  </section>
+
+  <!-- 8 · CODE -->
+  <section class="slide" data-time="1">
+    <div class="kicker">code layout</div>
+    <h2>Code the audience can actually read</h2>
+    <div class="cols c21" style="margin-top:12px">
+      <div>
+        <p class="codecap">vllm serve</p>
+        <pre class="code"><span class="cm"># one line → OpenAI-compatible endpoint</span>
+vllm serve <span class="s">Qwen/Qwen2.5-7B-Instruct</span> \
+  --max-model-len <span class="n">32768</span> \
+  --gpu-memory-utilization <span class="n">0.90</span> \
+  --kv-cache-dtype <span class="p">fp8</span>
+
+<span class="cm"># 4-bit weights, no retraining</span>
+vllm serve <span class="s">ModelCloud/Qwen2.5-7B-AWQ</span></pre>
+      </div>
+      <div class="card">
+        <h3>Why</h3>
+        <ul class="b compact">
+          <li>highlight <b>the</b> line that matters</li>
+          <li>≤ 10 lines per slide</li>
+          <li>annotate with <code class="tok">.cm</code> comments</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">Syntax colors: .cm comment · .k keyword · .s string · .n number · .f function · .p param. Keep terminal-style, monospaced.</aside>
+  </section>
+
+  <!-- 9 · FLOW + TIMELINE -->
+  <section class="slide" data-time="1">
+    <div class="kicker grn">diagram layouts</div>
+    <h2>Flows &amp; timelines</h2>
+    <div class="flow" style="margin-top:20px">
+      <div class="fnode c">Prompt<small>tokens</small></div><div class="farr">→</div>
+      <div class="fnode">Prefill<small>parallel</small></div><div class="farr">→</div>
+      <div class="fnode v">KV cache<small>VRAM</small></div><div class="farr">→</div>
+      <div class="fnode a">Decode<small>1 token/step</small></div><div class="farr">→</div>
+      <div class="fnode g">Text<small>stream</small></div>
+    </div>
+    <div class="timeline" style="margin-top:34px">
+      <div class="tl-item"><div class="t">STEP 1</div><h3>Measure first</h3><p>llama-bench / vllm bench before tuning anything.</p></div>
+      <div class="tl-item"><div class="t">STEP 2</div><h3>Quantize weights, then KV</h3><p>Biggest quality-per-GB win, in that order.</p></div>
+    </div>
+    <aside class="notes">.flow with .fnode/.farr for pipelines; .timeline for ordered steps. Both are pure layout — no images needed.</aside>
+  </section>
+
+  <!-- 10 · QUIZ -->
+  <section class="slide" data-time="1">
+    <div class="kicker mag">interaction: quiz</div>
+    <h2>Ask the room — before telling them</h2>
+    <div class="quiz" data-answer="b" data-qid="demo1" style="margin-top:14px">
+      <div class="q">What dominates single-user LLM inference latency on a consumer GPU?</div>
+      <button class="q-opt">More CUDA cores</button>
+      <button class="q-opt">Memory bandwidth (GB/s)</button>
+      <button class="q-opt">CPU single-thread speed</button>
+      <button class="q-opt">Disk read speed</button>
+      <div class="q-why">Decoding reads all weights once per token — generation speed is bandwidth-bound. This is why a 3090 (936 GB/s) beats cards with better FLOPS but less bandwidth.</div>
+    </div>
+    <aside class="notes">.quiz with data-answer="b". Options auto-letter A–D; wrong answers bounce, right answer locks, explanation reveals. Score feeds the end slide (data-score).</aside>
+  </section>
+
+  <!-- 11 · POLL -->
+  <section class="slide" data-time="1">
+    <div class="kicker mag">interaction: poll</div>
+    <h2>Live poll — click to vote</h2>
+    <div class="poll" style="margin-top:16px">
+      <div class="p-opt" data-weight="3"><div class="p-head"><span>I already self-host models</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt" data-weight="5"><div class="p-head"><span>I use cloud APIs only</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt" data-weight="2"><div class="p-head"><span>Both</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="hint">Pass the laptop / click on your own device copy — bars animate live. data-weight seeds the starting distribution.</div>
+    </div>
+    <aside class="notes">.poll with .p-opt rows; seeded by data-weight; first click locks the vote. Great for room temperature-checks.</aside>
+  </section>
+
+  <!-- 12 · CUSTOM WIDGET -->
+  <section class="slide" data-time="1">
+    <div class="kicker">interaction: custom widget</div>
+    <h2>Your own live component</h2>
+    <div class="cols c2" style="margin-top:14px">
+      <div class="card" data-widget="demo-counter">
+        <noscript>Enable JavaScript to see the widget.</noscript>
+      </div>
+      <div>
+        <p class="codecap">author API</p>
+        <pre class="code">window.<span class="f">DeckWidgets</span>[<span class="s">"demo-counter"</span>] =
+  <span class="k">function</span>(el, deck) {
+    el.innerHTML = <span class="s">"&lt;button&gt;…&lt;/button&gt;"</span>;
+    <span class="cm">// el = the div with data-widget="demo-counter"
+    // deck = engine API (go/next/state/…)</span>
+  };</pre>
+      </div>
+    </div>
+    <aside class="notes">Any element with data-widget="name" is initialized once from window.DeckWidgets. Deck 01 uses this for the VRAM calculator; deck 05 for the animated agent graph.</aside>
+  </section>
+
+  <!-- 13 · QUOTE -->
+  <section class="slide" style="justify-content:center">
+    <div class="kicker vio">quote layout</div>
+    <div class="quote">Any sufficiently advanced technology is indistinguishable from magic.</div>
+    <div class="quote-by">— Arthur C. Clarke</div>
+    <aside class="notes">Centered .quote; use for hooks and transitions.</aside>
+  </section>
+
+  <!-- 14 · SHARED TOOL LAYER -->
+  <section class="slide" data-time="1">
+    <div class="kicker grn">tool layer · widgets.js</div>
+    <h2>Five production tools, one registry</h2>
+    <div class="content" style="margin-top:14px">
+      <table class="t">
+        <thead><tr><th style="width:170px">Tool</th><th style="width:90px">Deck</th><th>What the audience does with it</th></tr></thead>
+        <tbody>
+          <tr><td><b>vram</b></td><td>01</td><td>model + quant + context → weights, KV cache and runtime against 24&nbsp;GB</td></tr>
+          <tr><td><b>ft-est</b></td><td>02</td><td>method + dataset → training VRAM and wall clock on one 3090</td></tr>
+          <tr><td><b>tok-sandbox</b></td><td>03</td><td>types any language → fragmentation and the cost multiplier</td></tr>
+          <tr><td><b>guard-sim</b></td><td>04</td><td>tries to smuggle a prompt past an English/Latin rule set — and gets away with it</td></tr>
+          <tr><td><b>graph-run</b></td><td>05</td><td>runs a swarm: fan-out, verifier failure, bounded retry, human gate</td></tr>
+        </tbody>
+      </table>
+      <div class="cols c3" style="margin-top:20px">
+        <div class="card"><h3><span class="ico">🧩</span>Same contract</h3><p class="dim" style="font-size:14px">One function per tool — <code class="tok">DeckWidgets["name"] = fn(el, DECK)</code> — written once in the template, named from any slide.</p></div>
+        <div class="card"><h3><span class="ico">🧹</span>Self-cleaning</h3><p class="dim" style="font-size:14px">Long-running tools subscribe to <code class="tok">DeckHooks.onSlideChange()</code>, so timers die when the presenter moves on.</p></div>
+        <div class="card"><h3><span class="ico">📐</span>Honest scope</h3><p class="dim" style="font-size:14px">Each tool says on-slide that it is a heuristic: it teaches the shape of a calculation, not a precise number.</p></div>
+      </div>
+    </div>
+    <aside class="notes">The registry is deck-agnostic: the tool lives in template/widgets.js, the slide only names it. Load order matters — widgets.js before deck.js, because deck.js walks [data-widget] once at boot. Keep tools heuristic-labelled; a calculator that implies false precision invites questions you cannot answer.</aside>
+  </section>
+
+  <!-- 15 · TOOL DEMO -->
+  <section class="slide" data-time="2">
+    <div class="kicker grn">tool layer · live</div>
+    <h2>The token tax, in any language</h2>
+    <div class="content" style="margin-top:16px">
+      <div data-widget="tok-sandbox"></div>
+      <div class="chiprow" style="margin-top:22px">
+        <span class="chip c">presets are one click</span>
+        <span class="chip v">type into the box — it re-tokenises live</span>
+        <span class="chip a">magenta = a word shattered into pieces</span>
+        <span class="chip g">heuristic simulator, not the real BPE</span>
+      </div>
+    </div>
+    <aside class="notes">Same component deck 03 uses, embedded here to prove reuse. Ask the room to shout a language, click it, and compare chars/token and the ×-multiplier against English. Japanese and Thai cost ~4× per screenful; Cyrillic lands in between. This is the fastest way to make "tokenizer choice is a budget line" land.</aside>
+  </section>
+
+  <!-- 14 · END -->
+  <section class="slide s-end">
+    <div class="kicker grn">closing</div>
+    <h2 style="font-size:48px">Template complete</h2>
+    <p class="sub" style="margin:14px auto 26px;max-width:640px">Quiz score collected during this talk:</p>
+    <div class="score-badge" data-score>0 / 1</div>
+    <div class="chiprow" style="margin-top:34px;justify-content:center">
+      <span class="chip c">← → navigate</span><span class="chip v">O overview</span><span class="chip g">S notes</span><span class="chip a">T timer</span>
+    </div>
+    <aside class="notes">The end slide pulls the live quiz score via data-score. Adapt into a "recap + links" slide in content decks.</aside>
+  </section>
+
+</div>
+<script>
+/* example widget — authors add their own per deck */
+window.DeckWidgets = window.DeckWidgets || {};
+window.DeckWidgets["demo-counter"] = function (el) {
+  var n = 0;
+  el.innerHTML = '<h3><span class="ico">🎛️</span> Click-o-meter</h3>' +
+    '<div style="font:700 56px/1.2 var(--font-display);color:var(--cyan)" id="dc-n">0</div>' +
+    '<p class="dim" style="font-size:14px;margin-bottom:14px">tokens generated (not really)</p>' +
+    '<button class="btn g">+1 token</button> <button class="btn ghost" id="dc-r">reset</button>';
+  el.querySelector(".btn.g").addEventListener("click", function () { el.querySelector("#dc-n").textContent = ++n; });
+  el.querySelector("#dc-r").addEventListener("click", function () { n = 0; el.querySelector("#dc-n").textContent = "0"; });
+};
+</script>
+<script src="widgets.js"></script>
+<script src="deck.js"></script>
+</body>
+</html>
