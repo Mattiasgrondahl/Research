@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative Video &amp; Images</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../template/deck.css">
+</head>
+<body data-brand="DIFFUSION · LOCAL" data-title="Video &amp; Image Generation on Your Own Hardware" data-duration="30">
+<div id="stage">
+
+  <!-- TITLE -->
+  <section class="slide s-title" data-time="0.5">
+    <div class="kicker vio">30-minute hands-on map</div>
+    <h1>Video &amp; images:<br><span class="grad-text">the models that fit your GPU</span></h1>
+    <p class="sub">LTX-2.5, Wan 2.2, HunyuanVideo-1.5, MiniMax H3, FLUX.2, Ideogram 4, Z-Image. Real speeds on consumer cards, the ComfyUI graph underneath, Wan2GP, and training a video LoRA without burning it in.</p>
+    <div class="meta"><span>timings from official ComfyUI templates</span><span>live speed/VRAM estimator inside</span><span>ai-toolkit walkthrough</span></div>
+    <aside class="notes">Everything here is sourced in research/notes/video-image-generation.md with 110 saved source files. Two honesty rules I'll keep on stage: numbers marked [measured] come from a project's own published benchmark; anything I scaled myself gets called an estimate out loud.</aside>
+  </section>
+
+  <!-- THESIS -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">the thesis</div>
+    <h2>Open video crossed the consumer line — and the bottleneck moved from the GPU to the graph</h2>
+    <div class="stats" style="margin-top:20px">
+      <div class="stat g"><div class="v">6 GB</div><div class="l">VRAM floor for Wan 2.x today via WanGP — <b>"Accessible to the GPU Poor"</b>, GTX 10-series included</div></div>
+      <div class="stat"><div class="v">5.5×</div><div class="l">same clip, same weights: <b>536 s → 97 s</b> on an RTX 4090D just by adding a 4-step distillation LoRA</div></div>
+      <div class="stat v"><div class="v">8 NFEs</div><div class="l">Z-Image-Turbo: sub-second on an H800, fits <b>16 GB</b>, Apache-2.0 — and it beat 16 of its 18 competitors on human preference</div></div>
+      <div class="stat a"><div class="v">5.0M</div><div class="l">downloads in five weeks for <b>MiniMax H3</b> (native stereo audio, 24 FPS, 4–15 s clips) under a community licence</div></div>
+    </div>
+    <div class="callout grn" style="margin-top:16px">So the question is no longer "can my card run it". It is: <b>do you understand the graph</b> — the sampler chain, the experts, the quantization, and the schedule you trained on.</div>
+    <aside class="notes">Anchors: WanGP INSTALLATION.md "Minimum requirements for 6 GB VRAM" and its tagline; 536 s / 97 s from the official ComfyUI template <code>video_wan2_2_14B_i2v.json</code> on an RTX 4090D 24 GB (measured, in-situ, single run per config, 640×640) [measured]; Z-Image-Turbo 8 NFEs / &lt;1 s / 16 GB / Apache-2.0 from its model card; MiniMax H3 5,057,414 downloads from the HF API on 2026-09-05.</aside>
+  </section>
+
+  <!-- AGENDA -->
+  <section class="slide" data-time="1">
+    <div class="kicker">agenda</div>
+    <h2>30 minutes, five stops</h2>
+    <div class="content" style="margin-top:12px">
+      <div class="ag-row"><div class="n">1</div><div><h3>Video models</h3><p>LTX, Wan 2.2, HunyuanVideo-1.5, MiniMax H3</p></div><span class="min">5 min</span></div>
+      <div class="ag-row"><div class="n">2</div><div><h3>Image models</h3><p>FLUX.2, Ideogram 4, Z-Image, SD3.5 — and what's still vapeware</p></div><span class="min">4 min</span></div>
+      <div class="ag-row"><div class="n">3</div><div><h3>Speed</h3><p>real timings, the estimator, what accelerators exploit</p></div><span class="min">4 min</span></div>
+      <div class="ag-row"><div class="n">4</div><div><h3>ComfyUI &amp; WanGP</h3><p>graphs, API format, the two-expert template, the 6 GB floor</p></div><span class="min">5 min</span></div>
+      <div class="ag-row"><div class="n">5</div><div><h3>Training a video LoRA</h3><p>ai-toolkit, the dataset, and burn-in</p></div><span class="min">7 min</span></div>
+    <small class="src">Slide budgets below total <b>28 min</b> of the 30-minute slot — the rest is your buffer for questions; the timer (T) counts the whole slot.</small>
+    </div>
+    <aside class="notes">The estimator is at minute ~13. Section 5 is deliberately the longest: that's where the practical value is for anyone who wants their own character or product in a video.</aside>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="slide s-section" data-section="1 · Video">
+    <div class="num">1</div>
+    <h2>Video models</h2>
+    <p class="sub">Four open families, three different ideas about what a video model is.</p>
+    <aside class="notes">Section 1: the field, then the one architectural fact worth explaining (Wan's two experts), then a quiz.</aside>
+  </section>
+
+  <!-- VIDEO FIELD -->
+  <section class="slide" data-time="2.5">
+    <div class="kicker">the field</div>
+    <h2>Four open families — and one of them is not a model you can run</h2>
+    <div class="content" style="margin-top:10px">
+      <table class="t sm">
+        <thead><tr><th>Model</th><th>What it is</th><th>Verified spec</th><th>Licence</th></tr></thead>
+        <tbody>
+          <tr class="hl-best"><td><b>LTX-2 / 2.3 / 2.5</b><br>Lightricks</td><td>the fast one: a DiT that puts audio + video in one model</td><td>LTX-2: native <b>4K / up to 50 fps</b>, synchronised audio, distilled <b>HD in 10 s on H100</b> (<b>15×</b> vs non-distilled). LTX-2.3 distilled = <b>8 sigmas + 4 sigmas</b>, ×2 temporal upscalers, MSR V2 = 2–5 subject refs. LTX-2.5 created <b>2026-07-23</b>, 1.48M dl, <b>gated</b></td><td>open weights (LTX-2.5 terms gated, not fetched)</td></tr>
+          <tr><td><b>Wan 2.2</b><br>Alibaba</td><td>the workhorse everyone's pipeline is built on</td><td>A14B = MoE <b>high-noise + low-noise expert</b> (~27B total, 14B active); <b>TI2V-5B</b> with 16×16×4 VAE does t2v <i>and</i> i2v at <b>720p / 24 FPS</b>; 14B runs on ≥24 GB with offload flags. <b>There is no official Wan 2.5</b> — the model hub returns nothing for it</td><td>Apache-2.0</td></tr>
+          <tr><td><b>HunyuanVideo-1.5</b><br>Tencent</td><td>the small one that behaves big</td><td><b>8.3B parameters</b> — the entire DiT fits in <b>10 GB</b>; 16×16×4 causal VAE + 64× patch → <b>up to 36× compression</b>; Sparse Sparse Attention; step-distilled <b>480p I2V at 8/12 steps (−75% on RTX 4090)</b>; official WanGP integration listed at <b>6 GB VRAM</b></td><td>community licence (weights + LoRAs published)</td></tr>
+          <tr class="hl-warn"><td><b>MiniMax H3</b><br>MiniMax</td><td>omni-modal system, <b>API-first</b></td><td>unified text/image/video/audio context → video with <b>native stereo audio</b>, <b>24 FPS</b>, <b>4–15 s</b>, 768p default, 2K via <code class="tok">H3-Regenerate-2K</code>, ≤3 reference clips. 5.06M dl, 4,928 likes, not gated</td><td><b>MiniMax Community Licence</b> — no published weights for local inference; local timing does not exist</td></tr>
+        </tbody>
+      </table>
+      <p class="mut" style="font-size:13px;margin-top:10px">Downloads/likes and creation dates: Hugging Face API, 2026-09-05. Specs: each project's own model card.</p>
+    </div>
+    <aside class="notes">Sources: HF Lightricks/LTX-2.5 (created 2026-07-23, gated) and LTX-2 card (4K/50fps, 15× distilled, "first DiT containing all core capabilities… in one model"); Wan 2.2 README (MoE high/low-noise, TI2V-5B 720p/24FPS, offload flags); Tencent HunyuanVideo-1.5 card (8.3B, 10 GB DiT, SSTA, 8-step distilled −75% on RTX 4090, WanGP integration at 6 GB); MiniMax H3 README (omni-modal, 24 FPS, 4–15 s, 768p→2K, ≤3 refs, community licence). Say plainly: H3 belongs in this talk because the audience will ask about it, but you cannot run it locally and nobody has published a consumer-GPU timing for it.</aside>
+  </section>
+
+  <!-- MOE -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker">the one architecture fact worth knowing</div>
+    <h2>Wan 2.2's "generate" button is really two models passing the clip between them</h2>
+    <div class="flow" style="margin-top:24px;justify-content:center">
+      <div class="fnode v">prompt<small>+ first frame</small></div>
+      <div class="farr">→</div>
+      <div class="fnode c">HIGH-NOISE expert<small>early sigmas · composition</small></div>
+      <div class="farr">→<small>boundary</small></div>
+      <div class="fnode g">LOW-NOISE expert<small>late sigmas · detail</small></div>
+      <div class="farr">→</div>
+      <div class="fnode">VAE decode<small>→ frames</small></div>
+    </div>
+    <div class="cols c2" style="margin-top:26px">
+      <div class="card accent-c"><h3>Why it matters to you</h3>
+        <ul class="b compact">
+          <li>The official ComfyUI template has <b>two UNET loaders and two samplers</b> — you can retarget each with its own LoRA</li>
+          <li>Style LoRAs mostly belong on the <b>high-noise</b> expert; detail LoRAs on the other</li>
+          <li>ai-toolkit can <b>alternate</b> between experts every N steps (<code class="tok">switch_boundary_every: 10</code>) to save memory</li>
+          <li>Hosted products hide all of this behind one button; the graph shows it</li>
+        </ul>
+      </div>
+      <div class="callout" style="align-self:center"><b>Mixture-of-experts, diffusion flavour:</b> ~27B parameters total, ~14B active per step. That is why a 14B "active" model needs the memory of a 27B one — both experts have to live somewhere.</div>
+    </div>
+    <aside class="notes">Sources: Wan 2.2 README (MoE high-noise/low-noise design, ~27B total / 14B active) and the official ComfyUI template JSON (2× UNETLoader, 2× KSamplerAdvanced, ComfySwitchNode). switch_boundary_every is from ai-toolkit's train_lora_wan22_14b_24gb.yaml. This is the single best "aha" for a mixed audience — the model isn't one thing.</aside>
+  </section>
+
+  <!-- QUIZ 1 -->
+  <section class="slide" data-time="1">
+    <div class="quiz" data-answer="b" data-qid="q-v1">
+      <div class="q">A colleague says "I'll just use Wan 2.5, it's the newest". What do you tell them?</div>
+      <button class="q-opt">It exists but is gated behind Lightricks' licence</button>
+      <button class="q-opt">There is no official Wan 2.5 — that's a LTX-2.5 / naming mix-up</button>
+      <button class="q-opt">It exists but only as a 5B text-to-video model</button>
+      <button class="q-opt">It exists but was deprecated for safety reasons</button>
+      <div class="q-why">A model-hub search for <em>Wan 2.5</em> returns <b>no official release</b>: only community LoRAs and GGUF packs mislabelled with "wan2.5". Alibaba shipped 2.1 → 2.2. The "2.5" in the room is almost always <b>LTX-2.5</b> from Lightricks.</div>
+    </div>
+    <aside class="notes">Checked 2026-09-05 via the Hugging Face search API: no Wan-AI/Tencent "2.5" entry. This matters commercially: plenty of blog posts and "AI video tool" landing pages cite Wan 2.5 benchmarks that do not exist.</aside>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="slide s-section" data-section="2 · Images">
+    <div class="num">2</div>
+    <h2>Image models</h2>
+    <p class="sub">Where the money went: text rendering, 16 GB cards, and one vendor with no weights at all.</p>
+    <aside class="notes">Section 2: the image field, the speed ladder, and what's still not real.</aside>
+  </section>
+
+  <!-- IMAGE FIELD -->
+  <section class="slide" data-time="2">
+    <div class="kicker vio">image field</div>
+    <h2>Four image models answer four different questions</h2>
+    <div class="content" style="margin-top:12px">
+      <table class="t">
+        <thead><tr><th>Question</th><th>Model</th><th>Why it wins</th></tr></thead>
+        <tbody>
+          <tr><td><b>"Best open quality, and I want to control it"</b></td><td>FLUX.2 [dev]</td><td>BFL's open-weight flagship (2025-11-22), 583k downloads in the first window; multi-reference editing; the ecosystem of quantizations is enormous</td></tr>
+          <tr><td><b>"Runs on my laptop / I want to fine-tune freely"</b></td><td>FLUX.2 [klein] 4B &amp; 9B</td><td>2026-01-14, <b>Apache-2.0</b>, both sizes with base + distill variants; the fine-tunable tier</td></tr>
+          <tr><td><b>"Typography, posters, brand layouts"</b></td><td>Ideogram 4</td><td>diffusion transformer tuned for text-in-image; ships with a JSON <b>Magic Prompt</b> side-car (per-model <b>Turbo Time</b> step counts) and fp8 + NF4 builds</td></tr>
+          <tr class="hl-best"><td><b>"Fast, permissive, on 16 GB"</b></td><td>Z-Image / Z-Image-Turbo</td><td>6B, Apache-2.0, <b>8 NFEs</b>, sub-second on H800 — and human-preference wins against 16 of its 18 listed competitors (vendor benchmark)</td></tr>
+        </tbody>
+      </table>
+      <div class="cols c2" style="margin-top:18px">
+        <div class="card accent-m"><h3>And what is <em>not</em> real</h3>
+          <ul class="b compact">
+            <li><b>Wan 2.5</b> — no official model exists (quiz 1)</li>
+            <li><b>Ideogram 4 weights for local use</b> — only fp8 / NF4 checkpoints; <b>no bf16 master</b> published, so a from-scratch LoRA on official weights is not possible</li>
+            <li><b>"SOTA image model X"</b> blog posts citing unlisted weights — check the hub before you plan on it</li>
+          </ul>
+        </div>
+        <div class="card"><h3>Where SD3.5 sits now</h3><p>Shipped Oct 2024 as large / large-turbo / medium. Still everywhere in old workflows and tooling, but it is no longer the answer to any of the four questions above — its value today is the size of its ecosystem, not its outputs.</p></div>
+      </div>
+    </div>
+    <aside class="notes">Sources: black-forest-labs/FLUX.2-dev (created 2025-11-22, 583,212 dl / 2,166 likes) and FLUX.2-klein-4B/9B (2026-01-14, Apache-2.0, base + distill); ideogram-ai/ideogram-4-fp8 and -nf4 (2026-05-30, no bf16 in the family); Tongyi-MAI/Z-Image and Z-Image-Turbo (6B, 8 NFEs, &lt;1 s on H800, Apache-2.0, HumanEval-AI leaderboard claims are vendor-published); stabilityai/stable-diffusion-3.5-large (2024-10-22). All from the HF API 2026-09-05 + model cards.</aside>
+  </section>
+
+  <!-- QUIZ 2 -->
+  <section class="slide" data-time="2">
+    <div class="kicker amb">speed on hardware you own</div>
+    <h2>Published, in-situ timings — with the caveats that matter</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div>
+        <div class="bars">
+          <div class="bar m" style="--w:100%"><span>Wan2.2 14B I2V · fp8 · 4090D</span><div class="track"><div class="fill"></div></div><span class="val">536 s</span></div>
+          <div class="bar g" style="--w:18%"><span>…+ lightx2v 4-step LoRA</span><div class="track"><div class="fill"></div></div><span class="val">97 s</span></div>
+          <div class="bar a" style="--w:20%"><span>Wan2.2 T2V variant</span><div class="track"><div class="fill"></div></div><span class="val">108 s</span></div>
+          <div class="bar g" style="--w:11%"><span>LTX-VideoQ8 · 720×480 · 4060 8 GB</span><div class="track"><div class="fill"></div></div><span class="val">&lt;60 s</span></div>
+          <div class="bar g" style="--w:2%"><span>Z-Image-Turbo · H800</span><div class="track"><div class="fill"></div></div><span class="val">&lt;1 s</span></div>
+        </div>
+        <p class="mut" style="font-size:13px;margin-top:12px">Bars are log-scaled for readability. Video bars = <b>one measured run per config inside the official ComfyUI template</b> at 640×640; the LTX and Z-Image bars are vendor claims.</p>
+      </div>
+      <div>
+        <div class="card accent-g"><h3>Three numbers to repeat</h3>
+          <ul class="b compact">
+            <li><b>536 → 97 s</b>: a distillation LoRA is the cheapest upgrade in this space</li>
+            <li><b>−75%</b>: HunyuanVideo-1.5's step-distilled 480p I2V at 8/12 steps on an RTX 4090 <span class="dim">(vendor)</span></li>
+            <li><b>1.7×</b> at 20 steps from MagCache; <b>×2–3</b> from FA2/Triton/vLLM in WanGP <span class="dim">(vendor)</span></li>
+          </ul>
+        </div>
+        <div class="callout mag" style="margin-top:14px">No public consumer-GPU timing exists for <b>LTX-2.5, MiniMax H3, Ideogram 4 or FLUX.2-dev</b>. If a blog shows one, ask for the graph and the node count.</div>
+      </div>
+    </div>
+    <aside class="notes">536/97/71 s: the measured block embedded in the official ComfyUI video_wan2_2_14B_i2v / -lightning template JSONs (RTX 4090D 24 GB, 640×640, 84% peak VRAM, single run each — say "measured, one run per config"). LTX-VideoQ8 claim: 720×480×121 frames in under a minute on an RTX 4060 with up to 3× speedup "with no accuracy loss". Z-Image-Turbo: sub-second on H800. Hunyuan and MagCache figures are vendor-published.</aside>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="slide s-section" data-section="3 · Speed">
+    <div class="num">3</div>
+    <h2>Speed</h2>
+    <p class="sub">Every accelerator in this space exploits the same three things.</p>
+    <aside class="notes">Section 3: the estimator widget and the principles behind the speedups. Keep this brisk — the widget is the star.</aside>
+  </section>
+
+  <!-- WIDGET -->
+  <section class="slide" data-time="2.5">
+    <div class="kicker mag">live demo · will it run, and how long</div>
+    <h2>Set your box, set your shot. The estimate is honest about itself</h2>
+    <div data-widget="gen-est" style="margin-top:10px">
+      <noscript><p class="dim">Demo needs JavaScript.</p></noscript>
+    </div>
+    <aside class="notes">How to drive it: (1) leave Wan 2.2 14B on the 4090 — it lands on the measured anchor, say so out loud ("this cell is a real run, not a model"); (2) turn the 4-step LoRA on → ~97 s; (3) drop to an 8 GB card → it stops fitting, and the fix line tells you to quantize; (4) quantize to GGUF Q4 → it fits again but the time estimate grows, because the speed/fit tradeoff is real; (5) push frames to 121 and watch VRAM rise while a WanGP-style offload would keep it flat — that's the next section. Anything off an anchor is an <b>extrapolation</b> by a pixel×frame scaling law; the readout says so every render.</aside>
+  </section>
+
+  <!-- WHY FAST -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">what the accelerators exploit</div>
+    <h2>Three levers, and a fourth you should not skip</h2>
+    <div class="cols c3" style="margin-top:18px">
+      <div class="card accent-v"><div class="ico">🧮</div><h3>Fewer steps</h3>
+        <ul class="b compact">
+          <li>Step-distillation LoRAs: 4–12 steps instead of 20–50</li>
+          <li>Cache tricks skip whole steps: TeaCache, MagCache (<b>1.7× at 20 steps</b>), TaylorSeer, FasterCache</li>
+          <li>Adapters now ship per model: <code class="tok">lightx2v/*-Stepwise-Lightning</code>, Helios (CVPR 2026)</li>
+        </ul>
+      </div>
+      <div class="card accent-c"><div class="ico">🪶</div><h3>Less memory</h3>
+        <ul class="b compact">
+          <li>int8 / fp8 / GGUF / <b>NVFP4</b> / NF4 / Nunchaku 4-bit</li>
+          <li>Quantized KV cache + offload instead of buying a card</li>
+          <li>WanGP: <b>VRAM independent of clip length</b> via aggressive offload</li>
+        </ul>
+      </div>
+      <div class="card accent-g"><div class="ico">🧩</div><h3>Cheaper math</h3>
+        <ul class="b compact">
+          <li>Sparse attention: SSTA — "up to 36× compression" pipeline in Hunyuan 1.5</li>
+          <li>GGUF CUDA kernels <b>+15%</b> video, <b>×3</b> GGUF LLM (vendor)</li>
+          <li>Tiled VAE decode so 1080p doesn't spike memory</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout amb" style="margin-top:20px">The fourth lever is <b>not</b> an accelerator: <b>generate small and upscale</b>. 640×640 then RIFE + FlashVSR / Lanczos. The Wan 2.2 x1.5/x2 upsampler is itself an official ComfyUI template at ≈12 GB. Speed you buy by not rendering pixels you were never going to keep.</div>
+    <aside class="notes">Sources: HunyuanVideo-1.5 card (SSTA, MagCache 1.7× at 20 steps, 4-step distill −75%), lightx2v adapter family, Helios CVPR 2026, FastVideo (UC Berkeley), WanGP docs (quant list, +15%/×3 CUDA kernels, offload), ComfyUI upscale workflow templates (wan22_i2v_14B_upsampler_x1.5 / _x2). Caveat worth saying: distillation and cache-skipping trade fidelity for speed, and the papers' "no accuracy loss" claims are theirs — check motion coherence on your own clips.</aside>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="slide s-section" data-section="4 · ComfyUI &amp; WanGP">
+    <div class="num">4</div>
+    <h2>ComfyUI &amp; WanGP</h2>
+    <p class="sub">The graph is the interface. Two tools, two philosophies.</p>
+    <aside class="notes">Section 4: what a workflow actually is (and the API-format trick that makes it automatable), the anatomy of the official Wan 2.2 template, then WanGP as the accessibility layer.</aside>
+  </section>
+
+  <!-- GRAPH NOT APP -->
+  <section class="slide" data-time="2">
+    <div class="kicker">what a workflow actually is</div>
+    <h2>A ComfyUI workflow is a dataflow graph — which is why you can automate it</h2>
+    <div class="cols c21" style="margin-top:14px">
+      <div>
+        <div class="code tight"><pre># the template file is a DAG; "API format" is the JSON the UI posts
+POST http://127.0.0.1:8188/prompt
+{
+  "prompt": { "1": {"class_type": "CheckpointLoaderSimple", ...},
+              "7": {"class_type": "KSampler", "inputs": {...}} },
+  "client_id": "&lt;ws-uuid&gt;"          # progress + execution_error over /ws
+}
+GET /prompt                 # still-queued work
+GET /prompt/pending         # capacity before POSTing (avoid 500s)
+GET /history/{prompt_id}    # outputs after exec_success
+GET /view?filename=…&amp;type=output
+
+# partial execution: queue only the output node you care about
+#   → renders a preview without paying for the video encode
+#   → and never overwrites the file the last run produced</pre></div>
+        <div class="codecap">ComfyUI backend-guide · frontend ≥1.24.x for partial execution, ≥1.24.3 for subgraphs</div>
+      </div>
+      <div>
+        <div class="card accent-c"><h3>Two formats, one graph</h3>
+          <ul class="b compact">
+            <li><b>Save format</b>: node titles, positions, colours — for humans</li>
+            <li><b>API format</b>: numeric IDs, no layout — for code</li>
+            <li>Every speed/memory decision is a <b>node you can change</b>: sampler, sigmas, quantization, VAE tiling</li>
+            <li>ComfyUI-Manager for install/update; <code class="tok">comfy-cli generate/list/schema</code> for automation</li>
+            <li>Runs on Python 3.13, cu130, <b>Ascend NPU</b>, <b>Cambricon MLU</b>, Apple Silicon, ROCm 7.2</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Sources: ComfyUI docs — backend-guide/api-endpoints (POST /prompt, client_id, /history/{prompt_id}, GET /view, pending capacity to avoid 500s), backend-guide/execution ("executing only up to that node and not running the full workflow" for partial execution; output-node conflict warnings), nodes/Progressive-execution, CHANGELOG 1.24.3 (Subgraph Template Library). The platform list is from the installation docs. Say the automation line for the business people: "this is why you can put it behind an API and a queue".</aside>
+  </section>
+
+  <!-- TEMPLATE ANATOMY -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker">anatomy of an official template</div>
+    <h2>The Wan 2.2 I2V template: 5 outer nodes, a 30-node subgraph, 3 model files</h2>
+    <div class="cols c2" style="margin-top:18px">
+      <div>
+        <div class="flow" style="justify-content:flex-start">
+          <div class="fnode c">Load First Frame<small>LoadImage</small></div>
+          <div class="farr">→</div>
+          <div class="fnode v">Wan 2.2 I2V 14B<small>30-node subgraph</small></div>
+          <div class="farr">→</div>
+          <div class="fnode g">Create &amp; Save Video<small>fps 16, mp4</small></div>
+        </div>
+        <div class="card accent-v" style="margin-top:18px"><h3>Inside the subgraph</h3>
+          <p style="font-size:15px">2× <code class="tok">UNETLoader</code> (high / low-noise expert) · 2× <code class="tok">KSamplerAdvanced</code> · <code class="tok">ComfySwitchNode</code> picking the expert · <code class="tok">CLIPLoader</code> (<code class="tok">wan</code> type) · <code class="tok">VAELoader</code> · <code class="tok">WanImageToVideo</code> · <code class="tok">ModelSamplingSD3</code> · <code class="tok">VAEDecode</code> · <code class="tok">CreateVideo</code></p>
+        </div>
+      </div>
+      <div>
+        <table class="t sm">
+          <thead><tr><th>File</th><th>Size</th><th>VRAM / time note</th></tr></thead>
+          <tbody>
+            <tr><td><b>GPU requirements</b></td><td>—</td><td>"<b>24GB VRAM minimum</b> for 480p images (576×512px)" · ≤640×640 needs <b>32 GB</b> · above that <b>40 GB</b> — "model weights + text encoder + VAE are quite heavy"</td></tr>
+            <tr><td><b>fp8_scaled</b></td><td>—</td><td>"can run on <b>24 GB VRAM with zero performance loss</b>" — the 155 s 720p figure is measured with it</td></tr>
+            <tr><td><b>Fast Wan2.2</b></td><td>—</td><td>"<b>12 seconds for 720p on B200</b>, no quant, distillation or custom kernels needed"</td></tr>
+            <tr><td>3 files</td><td>—</td><td>diffusion model (high+low) · <code class="tok">umt5_xxl_fp8_e4m3fn_scaled</code> text encoder · VAE</td></tr>
+          </tbody>
+        </table>
+        <p class="mut" style="font-size:13px;margin-top:10px">The <code class="tok">wanBlockSwap</code> setting is now <b>deprecated — a NOP</b>: the samplers use memory-savvy sampling by default.</p>
+      </div>
+    </div>
+    <aside class="notes">All quotes from ComfyUI's official template JSONs and docs: video_wan2_2_14B_i2v.json (nodes, model files, the 480p/32GB/40GB table), video_wan2_2_14B_i2v_lightning.json (fp8_scaled claim, 155 s 720p measured, the B200 Fast-Wan quote), nodes/video (wanBlockSwap deprecated: "it is not needed and will be a NOP now"). Also from the docs: "The speed difference between DPM++ 2M and Euler is not large" — the sampler is not where the time goes; the steps and the resolution are.</aside>
+  </section>
+
+  <!-- WANGP -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">WanGP — the accessibility layer</div>
+    <h2>One Python script whose whole pitch is "Accessible to the GPU Poor"</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div>
+        <table class="t sm">
+          <thead><tr><th>Claim</th><th>Detail (from its own docs)</th></tr></thead>
+          <tbody>
+            <tr><td><b>6 GB floor</b></td><td>GTX 1060/1080 and RTX 2060/2070 class; "the bottleneck is VRAM, not generation duration" — long videos take longer but need no extra VRAM</td></tr>
+            <tr><td><b>AMD</b></td><td>RDNA 2 / 3 / 3.5 / 4 (RX 7900, RX 9070…); <b>no Nvidia required</b></td></tr>
+            <tr><td><b>Quant menu</b></td><td>int8, fp8, GGUF, <b>NVFP4</b>, NF4, Nunchaku, mixed, custom; GGUF CUDA kernels "+15%" video, "×3" GGUF LLM</td></tr>
+            <tr><td><b>Length vs memory</b></td><td>101 frames @1080p ≈ <b>16 GB</b>; x2 upsample ≈6 GB, x4 ≈10 GB — VRAM <b>independent of clip length</b></td></tr>
+            <tr><td><b>Extras</b></td><td>Deepy assistant (8 GB, local LLM that writes the prompt), RIFE / FlashVSR / Lanczos, MMAudio + SeedVC, VACE / Animate / MultiTalk / InfiniteTalk / MSR</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="card accent-g"><h3>Why it belongs in an enterprise conversation</h3>
+          <ul class="b compact">
+            <li>It turns <b>existing</b> hardware into an inference fleet: workstation leftovers, gaming rigs, AMD cards</li>
+            <li>Free — with an explicit anti-fraud note: <b>"don't pay for WanGP"</b> — a cheap, real proof that the cost is electricity, not licences</li>
+            <li>Same model family as the official templates, so workflows transfer</li>
+          </ul>
+        </div>
+        <div class="callout amb" style="margin-top:14px">Honest limit: its own docs say "<b>model size alone does not determine whether a checkpoint will run</b>" and that fixed "6/12/20 GB tiers" are unreliable. Use its table, not a param count.</div>
+      </div>
+    </div>
+    <aside class="notes">All rows quoted from WanGP's OVERVIEW.md and INSTALLATION.md (wangp.ai docs, accessed 2026-09-05). Note for the sceptics: these are the project's own published figures, and it is a single-maintainer project — plan a bake-off if you'd depend on it commercially. HunyuanVideo-1.5's model card independently lists WanGP v9.62 as an official integration at 6 GB.</aside>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="slide s-section" data-section="5 · Training">
+    <div class="num">5</div>
+    <h2>Training a video LoRA</h2>
+    <p class="sub">ai-toolkit, a folder of clips, and the failure mode nobody warns you about.</p>
+    <aside class="notes">Section 5 is the practical core: the config, the dataset, burn-in, the checkpoint ladder, then the closing quiz/poll/recap.</aside>
+  </section>
+
+  <!-- TOOLKIT CONFIG -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker">ai-toolkit in one screen</div>
+    <h2>A 14B video LoRA on one 24 GB card: 4-bit weights plus a recovery adapter</h2>
+    <div class="cols c21" style="margin-top:12px">
+      <div>
+        <div class="code tight"><pre># config/examples/train_lora_wan22_14b_24gb.yaml  (official example)
+model:
+  name_or_path: "ai-toolkit/Wan2.2-T2V-A14B-Diffusers-bf16"
+  arch: 'wan22_14b'
+  quantize: true
+  qtype: "uint4|ostris/accuracy_recovery_adapters/…uint4.safetensors"
+  low_vram: true
+  train_high_noise: true   <span class="cm"># both experts, or pick one</span>
+  train_low_noise:  true
+network: {type: lora, linear: 32, linear_alpha: 32}
+datasets:
+  - folder_path: "/path/to/video/folder"
+    caption_ext: txt
+    caption_dropout_rate: 0.05      <span class="cm"># never 0</span>
+    num_frames: 1                   <span class="cm"># frames, not clips — see next</span>
+    resolution: [512, 768, 1024]
+train:
+  steps: 2000                       <span class="cm"># "500 - 4000 is a good range"</span>
+  switch_boundary_every: 10         <span class="cm"># alternate experts, save memory</span>
+save:  {dtype: float16, save_every: 250, max_step_saves_to_keep: 4}</pre></div>
+      </div>
+      <div>
+        <div class="card accent-c"><h3>What to say about each knob</h3>
+          <ul class="b compact">
+            <li><b>uint4 + recovery adapter</b> is what puts a 14B on one card</li>
+            <li><b>train_text_encoder: false</b> — shipped comment: "probably won't work with wan"</li>
+            <li>Samples render at <b>num_frames: 1</b> — you review stills, not videos</li>
+            <li>GUI on <code class="tok">localhost:8675</code>, or <code class="tok">python run.py cfg.yaml</code></li>
+          </ul>
+        </div>
+        <div class="callout amb" style="margin-top:12px">The image-first Wan 2.1 example still says "<b>we will train on 1 frame at a time</b>" — video LoRAs here are mostly trained on <b>frames</b>.</div>
+      </div>
+    </div>
+    <aside class="notes">Config is the official example, fetched from ostris/ai-toolkit (saved as .scratch/src_video/kit_cfg_wan22_14b_24gb.yaml). The recovery adapters live at huggingface.co/ostris/accuracy_recovery_adapters. The FLUX minimum in the toolkit FAQ is "24GB of VRAM for a standard LoRA", and the same FAQ says you do not need to crop or resize images — the toolkit buckets aspect ratios. Wan 2.1 example: resolution [632], train_on_first_frame: true, comment "AI-Toolkit does not currently support video datasets". Two config traps worth naming if asked: <code class="tok">cache_text_embeddings</code> and <code class="tok">unload_text_encoder</code> are mutually exclusive (the toolkit raises and tells you), and <code class="tok">quantize: false</code> with <code class="tok">skip_ref_load</code> is the documented escape from load-time OOM.</aside>
+  </section>
+
+  <!-- DATASET -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">the dataset is the hard part</div>
+    <h2>20–60 clips, 2–6 seconds each, captioned like you mean it</h2>
+    <div class="cols c2" style="margin-top:14px">
+      <div>
+        <table class="t sm">
+          <thead><tr><th>Item</th><th>Target</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><b>Clips</b></td><td>20–60</td><td>toolkit example uses 20 videos; more variety beats more footage of one thing</td></tr>
+            <tr><td><b>Length</b></td><td>2–6 s</td><td>toolkit docs ask for "multiple second" clips; long clips waste budget on one motion</td></tr>
+            <tr><td><b>Frame count</b></td><td>17–81, <b>8k+1</b></td><td>VAE temporal stride; mismatched counts get dropped or padded</td></tr>
+            <tr><td><b>Motion</b></td><td>varied, subject fills frame</td><td>with 20 clips you can't afford shots where the subject is small or static</td></tr>
+            <tr><td><b>Cuts</b></td><td>no hard cuts, fades, baked-in text</td><td>the model learns the discontinuity as part of your concept</td></tr>
+            <tr><td><b>Resolutions</b></td><td>several buckets</td><td>aspect-ratio buckets; "you do not need to crop or resize"</td></tr>
+            <tr><td><b>Captions</b></td><td>consistent, trigger phrase, dropout ≥ 0.05</td><td>identical captions = the trigger absorbs everything, including the background</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="card accent-g"><h3>The caption rule that saves you</h3>
+        <p style="font-size:15px">Caption <b>everything you want to be able to change</b> — camera, lighting, background, motion — and keep the trigger word for the thing you want locked. Burn-in is mostly the model having nothing left to attribute to context.</p></div>
+        <div class="card accent-m" style="margin-top:14px"><h3>Dataset tools in the toolkit</h3>
+          <ul class="b compact">
+            <li><code class="tok">only_if_contains</code> / <code class="tok">ignore_if_contains</code> — split datasets by caption without moving files</li>
+            <li>Sample generation every 250 steps; <code class="tok">eval_every</code> for a held-out set</li>
+            <li><code class="tok">low_vram: true</code> trades speed for fitting; <code class="tok">quantize: false</code> + <code class="tok">skip_ref_load</code> if you hit load-time OOM</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Lengths and counts: ai-toolkit official Wan 2.2 example (20 videos referenced in comments), WanGP dataset guide ("at least 8–10 seconds, multiple angles" for its own workflows), community video-LoRA guides. The 8k+1 rule follows Wan's VAE temporal compression (4× in 2.2, 16×16×4 in TI2V-5B). Label this section honestly as practitioner consensus plus the config's hard constraints — there is no paper that settles "how many clips".</aside>
+  </section>
+
+  <!-- BURN-IN -->
+  <section class="slide" data-time="2">
+    <div class="kicker mag">burn-in: the failure mode</div>
+    <h2>Burn-in is the LoRA leaking into everything — and each cause has a switch</h2>
+    <div class="content" style="margin-top:10px">
+      <table class="t sm">
+        <thead><tr><th>Symptom</th><th>Usual cause</th><th>What you change</th></tr></thead>
+        <tbody>
+          <tr><td>Every generated person becomes <b>your subject</b></td><td>identity over-binding: too many steps / too high strength</td><td>strength 0.4–0.6 → adopt the <b>earliest</b> checkpoint that works → cut steps 2000 → 800–1200</td></tr>
+          <tr><td>Concept drags its <b>background / lighting</b> along</td><td>captions never described background, so the trigger absorbed it</td><td>re-caption with camera, lighting, scene · <code class="tok">caption_dropout_rate</code> 0.1</td></tr>
+          <tr><td><b>Plastic, oversaturated, high-contrast</b> look</td><td>over-training on a turbo base model — the canonical Turbo symptom</td><td>lower LoRA strength; train on the non-turbo base and add the speed LoRA at inference; de-turbo stabilizer (<code class="tok">ostris/Z-Image-De-Turbo</code>)</td></tr>
+          <tr><td><b>Style bleeds into other prompts</b></td><td>rank too high for a small dataset</td><td><code class="tok">linear: 32</code> → 8–16 · target fewer layers · LoKr with <code class="tok">lokr_full_rank: true</code></td></tr>
+          <tr class="hl-warn"><td><b>i2V first-frame burn</b> — output looks like your reference frame forever</td><td>first-frame conditioning + a concept trained on that same look</td><td>train without the offending stills · lower strength · vary first frames in the dataset · prompt the change explicitly</td></tr>
+          <tr><td><b>Motion freezes / jitters</b></td><td>frames-only training with too few real motion examples</td><td>more clips containing the motion · keep <code class="tok">num_frames</code> &gt; 1 where VRAM allows · check the 8k+1 rule</td></tr>
+        </tbody>
+      </table>
+      <div class="cols c2" style="margin-top:14px">
+        <div class="card accent-g"><h3>Checkpoint-ladder protocol — the actual fix</h3>
+          <p style="font-size:15px"><code class="tok">save_every: 250</code>, keep 8+. Test <b>500 / 750 / 1000 / 1500</b> at strengths <b>0.4 / 0.6 / 0.8</b> on the <b>same 10 prompts</b> (5 "pure concept", 5 "concept in new contexts"). Adopt the <b>earliest</b> rung that captures it. That one sentence removes ~80% of burn-in grief.</p></div>
+        <div class="card accent-m"><h3>Two things that are <em>not</em> cures</h3>
+          <ul class="b compact">
+            <li><b>More steps.</b> Burn-in is over-attribution, and steps buy more of it</li>
+            <li><b>Regenerating from the same prompt.</b> You are sampling the same bias — use the ladder</li>
+          </ul></div>
+      </div>
+    </div>
+    <aside class="notes">Provenance, stated out loud: "burn-in" is <b>practitioner vocabulary</b>. I found no paper, no ai-toolkit FAQ entry, no WanGP docs page defining it — the community term for a related failure is "identity/character drift". The <a href="https://huggingface.co/ostris/Z-Image-De-Turbo">ostris/Z-Image-De-Turbo</a> stabilizer, the "lower strength on Turbo models" advice, and LoRA weight-strength sweeps are documented; the causal table above is my synthesis of documented mechanisms plus community practice. Label it as such on stage — it's the most challenged slide in the deck.</aside>
+  </section>
+
+  <!-- QUIZ 3 -->
+  <section class="slide" data-time="0.5">
+    <div class="quiz" data-answer="c" data-qid="q-v2">
+      <div class="q">Your video LoRA works beautifully on 5 test prompts but every unrelated prompt now shows your subject. Fastest correct fix?</div>
+      <button class="q-opt">Train 2,000 more steps so the model learns when to apply it</button>
+      <button class="q-opt">Add a second trigger word and hope the concepts separate</button>
+      <button class="q-opt">Drop LoRA strength and adopt an earlier checkpoint, then raise caption dropout</button>
+      <button class="q-opt">Switch to full fine-tuning — LoRAs are the problem</button>
+      <div class="q-why">Over-binding is a <b>strength and schedule</b> problem, so fix it with strength, the checkpoint ladder, and captions that leave attributes for context to explain. More steps make it worse, and a full fine-tune is strictly harder to control and impossible to mix.</div>
+    </div>
+    <aside class="notes">Reinforces the ladder. If they ask "what strength should I ship?": the answer is "the number your 10-prompt test produced", written in the model card next to the LoRA, because it travels with the checkpoint.</aside>
+  </section>
+
+  <!-- POLL -->
+  <section class="slide" data-time="0.5">
+    <div class="poll" data-pid="p-gen">
+      <h3>What would you actually generate locally first?</h3>
+      <div class="p-opt"><div class="p-head"><span>Product / brand imagery at volume</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>Short video clips for socials</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>A consistent character / style LoRA</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>Nothing — the API is cheaper than my time</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="hint">Tap a bar. Counts live in this page only.</div>
+    </div>
+    <aside class="notes">The last option is often the honest one — say it: at 4090 speeds, an hour of your time plus 20 minutes of failed renders usually beats the per-clip price of an API, until you need 500 clips. Then the GPU wins.</aside>
+  </section>
+
+  <!-- RECAP -->
+  <section class="slide" data-time="1">
+    <div class="kicker grn">recap</div>
+    <h2>Five things to remember</h2>
+    <div class="content" style="margin-top:12px">
+      <ul class="b">
+        <li><b>6 GB is the new floor.</b> WanGP and HunyuanVideo-1.5 put open video on GTX-10-class and AMD cards; quantization, not param count, decides if it runs.</li>
+        <li><b>A distillation LoRA is the cheapest speed there is:</b> 536 s → 97 s on the same 4090 with the same weights.</li>
+        <li><b>ComfyUI is a graph, not an app:</b> API-format JSON + <code class="tok">POST /prompt</code> + partial execution means it automates — and every speed/memory choice is a node you can see.</li>
+        <li><b>Wan 2.2 is two experts,</b> and there is no official Wan 2.5. Know which model you're actually quoting.</li>
+        <li><b>Video LoRAs die of schedule and dataset, not VRAM.</b> 20–60 clips, 8k+1 frames, captions that name every variable attribute — then take the <b>earliest checkpoint on the ladder</b> that works.</li>
+      </ul>
+      <div class="chiprow" style="margin-top:18px"><span class="chip">quiz score: <b data-score>–</b></span><span class="chip v">LTX-2.5</span><span class="chip c">Wan 2.2</span><span class="chip g">Hunyuan 1.5</span><span class="chip a">Z-Image-Turbo</span><span class="chip m">burn-in</span></div>
+    </div>
+    <aside class="notes">Full citations, the claim-audit table and the could-not-verify list (LTX-2.5 licence terms and param count, MiniMax H3 local inference, per-GPU timings for FLUX.2-dev / Ideogram 4, "burn-in" as a formal term) live in research/notes/video-image-generation.md. Next: deck 09 — AI beyond cyber and engineering: biology, robots, and the futures.</aside>
+  </section>
+
+</div>
+<script>
+/* ---- generation speed / VRAM estimator ---- */
+window.DeckWidgets = window.DeckWidgets || {};
+window.DeckWidgets["gen-est"] = function (el) {
+  /* Anchors [measured] = published by the project itself (official ComfyUI template
+     benchmarks / model cards). Everything away from an anchor is MY extrapolation:
+     time ∝ pixels × frames^0.85 / steps, VRAM ∝ quant + pixels + frames. The readout
+     says which of the two you are looking at. */
+  var MODELS = [
+    { id: "wan22", label: "Wan 2.2 14B I2V (2 experts)", aSec: 536, aVram: 20.2, aPx: 409600, aFr: 40, baseSteps: 40,
+      distill: 97 / 536, note: "RTX 4090D · 640×640 · fp8_scaled · measured <b>536 s</b>, and <b>97 s</b> with the 4-step LoRA (official ComfyUI template benchmark)" },
+    { id: "hunyuan", label: "HunyuanVideo-1.5 480p I2V", aSec: 130, aVram: 8.6, aPx: 409920, aFr: 40, baseSteps: 20,
+      distill: 0.25, note: "8.3B params, DiT fits 10 GB; vendor: step-distilled at 8 steps is <b>−75% on an RTX 4090</b> (so this bar uses 0.25×, not steps/steps)" },
+    { id: "ltxv", label: "LTX-VideoQ8 720×480", aSec: 55, aVram: 7.2, aPx: 345600, aFr: 121, baseSteps: 25,
+      distill: 0.34, note: "vendor claim: <b>under a minute</b> on an RTX 4060 8 GB, up to 3× speed-up 'with no accuracy loss'" },
+    { id: "zimage", label: "Z-Image-Turbo (image)", aSec: 1.0, aVram: 14, aPx: 1048576, aFr: 1, baseSteps: 8,
+      distill: 1, note: "6B, <b>8 NFEs</b>, sub-second on an H800, fits 16 GB, Apache-2.0 — image, so 'frames' is ignored" }
+  ];
+  var GPUS = [
+    { id: "4060", label: "RTX 4060 · 8 GB", vram: 8, rel: 0.38 },
+    { id: "3060", label: "RTX 3060 12 GB", vram: 12, rel: 0.42 },
+    { id: "4070", label: "RTX 4070 · 12 GB", vram: 12, rel: 0.62 },
+    { id: "4090", label: "RTX 4090 · 24 GB", vram: 24, rel: 1.0 },
+    { id: "5090", label: "RTX 5090 · 32 GB", vram: 32, rel: 1.75 },
+    { id: "wangp", label: "WanGP on 6 GB (offloaded)", vram: 6, rel: 0.13, offload: true }
+  ];
+  var RES = [{ id: "480p", label: "832×480", px: 399360 }, { id: "640", label: "640×640", px: 409600 },
+             { id: "720p", label: "1280×720", px: 921600 }, { id: "1080p", label: "1920×1080", px: 2073600 }];
+  var Q = [{ id: "fp8", label: "fp8_scaled", v: 0.0, s: 1.0 }, { id: "int8", label: "int8", v: -2.5, s: 1.15 },
+           { id: "gguf4", label: "GGUF Q4 / NVFP4", v: -7.5, s: 1.45 }, { id: "fp16", label: "fp16 (no quant)", v: 6.5, s: 0.85 }];
+
+  var st = { m: "wan22", gpu: "4090", res: "640", q: "fp8", frames: 40, distill: true, cache: false };
+
+  el.innerHTML =
+    '<div class="calc">' +
+      '<div>' +
+        '<div class="ctrl"><label style="display:block;font:600 13px var(--font-mono);color:var(--txt-2);margin-bottom:4px">model</label><select class="sel" id="ge-m"></select></div>' +
+        '<div class="ctrl"><label style="display:block;font:600 13px var(--font-mono);color:var(--txt-2);margin-bottom:4px">your GPU</label><select class="sel" id="ge-gpu"></select></div>' +
+        '<div class="cols c2" style="gap:14px">' +
+          '<div class="ctrl"><label style="display:block;font:600 13px var(--font-mono);color:var(--txt-2);margin-bottom:4px">resolution</label><select class="sel" id="ge-res"></select></div>' +
+          '<div class="ctrl"><label style="display:block;font:600 13px var(--font-mono);color:var(--txt-2);margin-bottom:4px">quantization</label><select class="sel" id="ge-q"></select></div>' +
+        '</div>' +
+        '<div class="ctrl"><label>frames <output id="ge-fr-out"></output></label><input type="range" id="ge-fr" min="17" max="241" step="8" value="40"></div>' +
+        '<div style="margin-top:4px">' +
+          '<button class="btn g" id="ge-distill">4-step distill LoRA: ON</button> ' +
+          '<button class="btn ghost" id="ge-cache">cache skip (Tea/MagCache): OFF</button>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<div class="verdict show pass" id="ge-verdict"></div>' +
+        '<div class="readout" id="ge-out" style="margin-top:12px"></div>' +
+      '</div>' +
+    '</div>';
+
+  var $ = function (i) { return el.querySelector("#" + i); };
+  function fill(sel, arr, val) {
+    arr.forEach(function (o) { var op = document.createElement("option"); op.value = o.id; op.textContent = o.label; if (o.id === val) op.selected = true; sel.appendChild(op); });
+  }
+  fill($("ge-m"), MODELS, st.m); fill($("ge-gpu"), GPUS, st.gpu);
+  fill($("ge-res"), RES, st.res); fill($("ge-q"), Q, st.q);
+
+  function compute() {
+    var m = MODELS.filter(function (x) { return x.id === st.m; })[0];
+    var g = GPUS.filter(function (x) { return x.id === st.gpu; })[0];
+    var r = RES.filter(function (x) { return x.id === st.res; })[0];
+    var q = Q.filter(function (x) { return x.id === st.q; })[0];
+    var fr = st.m === "zimage" ? 1 : st.frames;
+
+    var stepsFactor = st.distill ? m.distill : 1;
+    var cacheFactor = st.cache ? 0.6 : 1;
+    var atAnchor = (st.m === "wan22" && st.gpu === "4090" && st.res === "640" && st.q === "fp8" && fr === m.aFr && !st.cache);
+
+    var sec = m.aSec
+      * (r.px / m.aPx)                 /* pixels */
+      * Math.pow(fr / m.aFr, 0.85)     /* frames, sub-linear */
+      * stepsFactor                    /* distillation */
+      * cacheFactor                    /* TeaCache / MagCache */
+      * q.s                            /* quantization trades memory for math efficiency */
+      / g.rel;                         /* card ladder, 4090 = 1.0 */
+    if (atAnchor) sec = m.aSec * (st.distill ? m.distill : 1);
+
+    /* VRAM: weights scale with quant, activations with pixels and frames */
+    var vram = m.aVram + q.v + 3.0 * (r.px / m.aPx - 1) + 1.8 * (fr / m.aFr - 1);
+    if (st.m === "zimage") vram = m.aVram + q.v;
+    if (atAnchor) vram = m.aVram;
+    if (g.offload) vram *= 0.45;       /* WanGP streams weights from RAM: time up, VRAM down */
+    vram = Math.max(1.2, vram);
+    return { m: m, g: g, r: r, q: q, fr: fr, sec: sec, vram: vram, atAnchor: atAnchor };
+  }
+
+  function render() {
+    var c = compute();
+    var fits = c.vram <= c.g.vram;
+    var v = $("ge-verdict");
+    v.className = "verdict show " + (fits ? (c.vram > c.g.vram * 0.92 ? "warn" : "pass") : "fail");
+    v.innerHTML = fits
+      ? "✅ fits — " + c.vram.toFixed(1) + " GB of " + c.g.vram + " GB · ~" + fmtT(c.sec) + " per clip" +
+        '<div style="font:500 12px/1.45 var(--font-mono);opacity:.72;margin-top:5px">' + (c.atAnchor ? "this cell is a MEASURED anchor, not an estimate" : "estimate: extrapolated from the nearest published anchor") + '</div>'
+      : "⛔ does not fit — needs ~" + c.vram.toFixed(1) + " GB on a " + c.g.vram + " GB card" +
+        '<div style="font:500 12px/1.45 var(--font-mono);opacity:.72;margin-top:5px">fixes, in order: quantize harder (int8 → GGUF Q4 / NVFP4) · drop resolution · fewer frames · tiled VAE · WanGP offload ("VRAM is the bottleneck, not clip length")</div>';
+
+    $("ge-out").innerHTML =
+      '<div>' + c.m.note + '</div>' +
+      '<div class="big ' + (fits ? "ok" : "warn") + '" style="margin-top:6px">' + fmtT(c.sec) + '</div>' +
+      '<div>' + c.r.label + ' · ' + c.fr + (c.m.id === "zimage" ? " image" : " frames") + ' · ' + c.q.label +
+        (st.distill ? ' · 4-step LoRA' : ' · ' + c.m.baseSteps + ' steps') + (st.cache ? ' · cache-skip' : '') + '</div>' +
+      '<div style="margin-top:8px">VRAM <b>' + c.vram.toFixed(1) + ' GB</b> / ' + c.g.vram + ' GB ' +
+        '<span class="' + (fits ? "ok" : "warn") + '">' + Math.round(c.vram / c.g.vram * 100) + '%</span></div>' +
+      '<div>relative speed vs a 4090 <b>' + (c.g.rel * 100).toFixed(0) + '%</b> (rough card ladder — not a benchmark)</div>' +
+      '<div style="margin-top:8px;color:var(--txt-3)">then add: upscale pass (x2 ≈ +6 GB, 1.5× time) and an audio pass if you want sound</div>';
+  }
+  function fmtT(s) {
+    if (s < 1) return (s * 1000).toFixed(0) + " ms";
+    if (s < 90) return s.toFixed(s < 10 ? 1 : 0) + " s";
+    return Math.floor(s / 60) + "m " + Math.round(s % 60) + "s";
+  }
+
+  $("ge-m").addEventListener("change", function (e) { st.m = e.target.value; render(); });
+  $("ge-gpu").addEventListener("change", function (e) { st.gpu = e.target.value; render(); });
+  $("ge-res").addEventListener("change", function (e) { st.res = e.target.value; render(); });
+  $("ge-q").addEventListener("change", function (e) { st.q = e.target.value; render(); });
+  $("ge-fr").addEventListener("input", function () { st.frames = +this.value; $("ge-fr-out").textContent = this.value + " (" + (12.5 * this.value / 100).toFixed(1) + "s @12.5fps)"; render(); });
+  $("ge-distill").addEventListener("click", function () {
+    st.distill = !st.distill;
+    this.className = "btn " + (st.distill ? "g" : "ghost");
+    this.textContent = "4-step distill LoRA: " + (st.distill ? "ON" : "OFF");
+    render();
+  });
+  $("ge-cache").addEventListener("click", function () {
+    st.cache = !st.cache;
+    this.className = "btn " + (st.cache ? "g" : "ghost");
+    this.textContent = "cache skip (Tea/MagCache): " + (st.cache ? "ON" : "OFF");
+    render();
+  });
+
+  $("ge-fr-out").textContent = st.frames + " (" + (12.5 * st.frames / 100).toFixed(1) + "s @12.5fps)";
+  render();
+};
+</script>
+<script src="../template/widgets.js"></script>
+<script src="../template/deck.js"></script>
+</body>
+</html>

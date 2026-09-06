@@ -1,5 +1,6 @@
 /* ============================================================
-   NOCTURNE · widgets.js — interactive tools for decks 01–05
+   NOCTURNE · widgets.js — shared interactive tools for decks 01–05
+   (decks 06–09 register their own inline widgets in the deck file)
    ------------------------------------------------------------
    Registers implementations into window.DeckWidgets, which
    template/deck.js discovers via [data-widget="name"].

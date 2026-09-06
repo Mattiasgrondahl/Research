@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI in Matter — Bio, Robots, Swarms, Futures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../template/deck.css">
+</head>
+<body data-brand="MATTER · FUTURES" data-title="AI Beyond the Chatbox: Biology, Robots, Swarms and the Two Futures" data-duration="30">
+<div id="stage">
+
+  <!-- TITLE -->
+  <section class="slide s-title" data-time="0.5">
+    <div class="kicker amb">30-minute argument</div>
+    <h1>AI in matter:<br><span class="grad-text">proteins, robots, swarms — and which future</span></h1>
+    <p class="sub">What foundation models actually changed in biology, what a robot arm can and cannot do, where the AI sits in a drone swarm — and why dystopia and utopia are both procurement decisions.</p>
+    <div class="meta"><span>every claim sourced</span><span>Nobel-validated wins + documented limits</span><span>live futures dial at minute 22</span></div>
+    <aside class="notes">This is the "beyond cyber and engineering" talk. Structure: one verified win, one verified limit, and one verified control per domain — then argue that the controls, not the capability curves, decide the future. Sources are in research/notes/bio-robots-futures.md with the raw files in .scratch/src_bio/; the claim audit is at the bottom of that note.</aside>
+  </section>
+
+  <!-- THESIS -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">the thesis</div>
+    <h2>A foundation model collapsed one expensive step in each domain — and the physical world kept its veto</h2>
+    <div class="stats" style="margin-top:20px">
+      <div class="stat g"><div class="v">200M</div><div class="l">protein structures published by AlphaFold DB; research on previously structure-less proteins rose <b>23–32%</b> after release — a floodlight, not a streetlight</div></div>
+      <div class="stat"><div class="v">10 min</div><div class="l">of teleop demos gave ALOHA <b>80–90%</b> success on fine bimanual tasks. The bottleneck is now <b>350 hours</b> of demos (DROID), not the algorithm</div></div>
+      <div class="stat m"><div class="v">1 kHz</div><div class="l">attitude loops are still classical control. LLMs run at <b>mission level</b>, seconds to minutes — not at the servo</div></div>
+      <div class="stat a"><div class="v">166–3–15</div><div class="l">UN General Assembly vote (Dec 2024) to open talks on lethal autonomy; <b>12 years</b> of CCW discussions, still no negotiating mandate</div></div>
+    </div>
+    <div class="callout grn" style="margin-top:16px">So the interesting question isn't "how smart". It's <b>who screens, who is granted access, who owns the compute, and what the doctrine says on a lost link</b>. Those are the levers — and they are all human.</div>
+    <aside class="notes">Anchors: AlphaFold DB scale and the 23–32% natural-experiment uplift (Hill &amp; Stein 2026; IGL 2025 survey of 427 structural biologists — cited via the AlphaFold article). ALOHA 80–90% from 10 minutes of demonstrations (arXiv:2304.13705 family, act_abs.html); DROID 76k trajectories / 350 hours / 564 scenes / 50 collectors / 12 months (droid_abs.html). 1 kHz classical inner loops vs LLM-at-mission-level is the framing of the 2026 agentic-UAV-swarm surveys (arXiv:2607.09756 and kin). UNGA vote 166–3–15, 2 December 2024 (wikipedia_killer_robots.html).</aside>
+  </section>
+
+  <!-- AGENDA -->
+  <section class="slide" data-time="1">
+    <div class="kicker">agenda</div>
+    <h2>30 minutes, five stops</h2>
+    <div class="content" style="margin-top:12px">
+      <div class="ag-row"><div class="n">1</div><div><h3>Biology &amp; DNA</h3><p>what the models do, what the wet lab still refuses</p></div><span class="min">5.5 min</span></div>
+      <div class="ag-row"><div class="n">2</div><div><h3>Robots</h3><p>vision-language-action, the data wall, what "90%" means</p></div><span class="min">3.5 min</span></div>
+      <div class="ag-row"><div class="n">3</div><div><h3>Drone swarms</h3><p>where AI actually sits, spoofing, the contested kill chain</p></div><span class="min">5.5 min</span></div>
+      <div class="ag-row"><div class="n">4</div><div><h3>The two futures</h3><p>dystopia and utopia, both with sources — then the dial</p></div><span class="min">6 min</span></div>
+      <div class="ag-row"><div class="n">5</div><div><h3>What decides which one</h3><p>screening, tiers, doctrine, ownership — your checklist</p></div><span class="min">4.5 min</span></div>
+    <small class="src">Slide budgets below total <b>28 min</b> of the 30-minute slot — the rest is your buffer for questions; the timer (T) counts the whole slot.</small>
+    </div>
+    <aside class="notes">If you are short on time, cut §2 to one slide and keep the futures dial — that's the part people argue about afterwards.</aside>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="slide s-section" data-section="1 · Biology">
+    <div class="num">1</div>
+    <h2>Biology &amp; DNA</h2>
+    <p class="sub">Prediction became free. Building and testing did not.</p>
+    <aside class="notes">Section 1: what the models do, the honest limits, one drug that actually reached humans, and a quiz on the difference between structure and affinity.</aside>
+  </section>
+
+  <!-- BIO TABLE -->
+  <section class="slide" data-time="2">
+    <div class="kicker">the shelf</div>
+    <h2>Proteins, genomes, cells — three model families, all with open weights</h2>
+    <div class="content" style="margin-top:10px">
+      <table class="t sm">
+        <thead><tr><th>Domain</th><th>Models</th><th>Verified capability</th><th>Access</th></tr></thead>
+        <tbody>
+          <tr class="hl-best"><td><b>Protein structure</b></td><td>AlphaFold 2 (Nature 2021) → 3 (Nature 2024) · Boltz-1/2 · Chai-1 · ESMFold</td><td>CASP14 accuracy "competitive with experimental structures"; <b>~200M</b> structures released (214M by 2024); AF3 adds <b>DNA/RNA/ligand/PTM</b> complexes (~50% better interaction accuracy, launch claim). ESM Metagenomic Atlas: <b>767M</b> structures</td><td>AF3 weights <b>non-commercial</b>; Boltz <b>MIT</b>, Chai <b>Apache-2.0</b></td></tr>
+          <tr><td><b>De novo design</b></td><td>RFdiffusion · RFantibody (Baker lab)</td><td>binders and antibodies generated to a target epitope. Their own README: best campaign found VHH binders from <b>95 designs</b>, but "in the more general case… campaigns in the <b>10k range</b> will be required", limited by "lack of a reliable filtering metric"</td><td>open</td></tr>
+          <tr><td><b>Genomes</b></td><td>Evo 2 · Nucleotide Transformer · DNABERT-2</td><td>Evo 2: single-nucleotide resolution, <b>1M-bp context</b>, <b>8.8T tokens</b> (OpenGenome2), 1B→40B. DNABERT-2: matches prior SOTA with <b>21× fewer parameters</b> and ~92× less pretraining GPU time (GUE: 36 datasets / 9 tasks)</td><td>open weights (NT: CC-BY-NC-SA)</td></tr>
+          <tr><td><b>Cells &amp; variants</b></td><td>scVI · scGPT · scFoundation · AlphaMissense · ESM-1v</td><td>scGPT "whole-human" checkpoint on <b>33M cells</b>, zero-shot annotation; AlphaMissense classifies <b>89%</b> of human missense variants benign/pathogenic — a database of all 71M possible substitutions</td><td>open / research</td></tr>
+        </tbody>
+      </table>
+      <p class="mut" style="font-size:13px;margin-top:10px">Nobel Prize in Chemistry, 9 Oct 2024: Hassabis &amp; Jumper (structure prediction) and Baker (computational design).</p>
+    </div>
+    <aside class="notes">Citations: AlphaFold 2 (PMID 34265844), AlphaFold 3 (PMID 38718835), DB scale + glycans caveat via the AlphaFold article; Boltz README ("first fully open-source model to approach AlphaFold3 accuracy"; Boltz-2 "approaches FEP accuracy while running 1000× faster" — vendor claim, no independent replication fetched); Chai-1 README; ESM README (ESM-2/ESMFold Science 2022, ESM-1v zero-shot, Atlas 617M + 150M); RFantibody/RFdiffusion READMEs (quoted verbatim); Evo 2 README + Nature 2026 paper; DNABERT-2 (arXiv:2306.15006, ICLR 2024); scVI (Nat Methods 2018), scGPT (Nat Methods 2024), scFoundation (Nat Methods 2024); AlphaMissense (Science 2023, PMID 37733863). Nobel press release 2024.</aside>
+  </section>
+
+  <!-- LIMITS -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker mag">the wet lab still has a veto</div>
+    <h2>Five documented limits — one of them is a Nobel-team-sized surprise</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div>
+        <ul class="b compact">
+          <li><b>Disordered and low-confidence regions</b> are common — the model is honest about it via pLDDT, and biology lives there</li>
+          <li><b>Complexes are harder than chains:</b> AF-Multimer was accurate for protein–protein interactions roughly <b>70%</b> of the time (2021)</li>
+          <li><b>Off-distribution ligands:</b> AF3 accuracy "drops markedly" outside its training distribution, and it is insensitive to adversarial decoys — signs of <b>memorization</b></li>
+          <li><b>Glycans:</b> 50–70% of human-proteome structures would be incomplete without them</li>
+          <li><b>Orphan and synthetic proteins</b> have no multiple-sequence alignment, so the evolutionary signal the model leans on isn't there</li>
+          <li class="dim">And even with perfect static structures: folding pathways and dynamics remain unsolved</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card accent-m"><h3>The surprise</h3>
+          <p style="font-size:15px">At CASP16 (Nov 2024), on <b>real pharmaceutical targets</b>, AF3-based models <b>did not significantly beat older methods</b> at pose prediction. The headline benchmark and the use case a pharma team cares about are not the same measurement.</p></div>
+        <div class="callout amb" style="margin-top:14px">Reported in July 2026: DeepMind <b>disbanded the Nobel-winning AlphaFold team</b>. A public good can still be abandoned by a corporate strategy — <b>access is not stewardship</b>.</div>
+      </div>
+    </div>
+    <aside class="notes">Limits and quotes via the AlphaFold article (multimer ~70%, AF3 off-distribution drop, decoy insensitivity/memorization, 50–70% glycan incompleteness, orphan proteins, dynamics); CASP16 pharma-target result via the Isomorphic article (Nov 2024); team dissolution attributed to FT reporting, cited there. Say "reportedly" for the team — it's a news attribution, not a primary source.</aside>
+  </section>
+
+  <!-- DRUG NUMBERS -->
+  <section class="slide" data-time="1">
+    <div class="kicker vio">one drug, and the base rates around it</div>
+    <h2>An AI-designed drug reached Phase 2a. That is the win. Here is the denominator.</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div class="card accent-g"><h3>Rentosertib (ISM3312), Insilico</h3>
+        <ul class="b compact">
+          <li>AI-identified <b>TNIK inhibitor</b> for idiopathic pulmonary fibrosis</li>
+          <li>Peer-reviewed <b>Phase I: 78 healthy volunteers</b> (NCT05154240) + a separate China Phase I, then a <b>randomized Phase 2a</b></li>
+          <li>Company framing: target → clinical candidate in <b>18 months</b> <span class="dim">(press, not audited)</span></li>
+          <li>Insilico listed in Hong Kong late 2025, raising ~<b>$293M</b></li>
+        </ul>
+      </div>
+      <div class="card accent-m"><h3>The denominator</h3>
+        <ul class="b compact">
+          <li>Wong/Siah/Lo (Biostatistics 2019): <b>406,038</b> trial entries, <b>21,143</b> compounds, 2000–2015</li>
+          <li>Oncology success rate <b>3.4%</b> (lower than the 5.1% often quoted)</li>
+          <li>Trials using <b>biomarkers for patient selection</b> succeed more — so the compressible part is <b>selection and design</b>, not magic</li>
+          <li>The "$2.6M discovery cost" figure is everywhere and <b>does not verify</b> — don't use it</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:14px">Self-driving labs are real too: <b>Coscientist</b> (Nature 2023) planned and ran chemistry experiments on a cloud lab autonomously; <b>GNoME</b> proposed <b>2.2M</b> candidate crystals, <b>736</b> already independently synthesized.</div>
+    <aside class="notes">Rentosertib: Nat Biotechnol 2025, PMID 38459338; trial count and randomisation from the paper's reporting. Base rates: PMID 29394327. Coscientist: PMID 38123806. GNoME: Nature 2023. Isomorphic: Novartis + Eli Lilly partnerships Jan 2024 and a $600M Series A (Apr 2025) are sourced; the deal dollar totals are not, so I don't state them. The $2.6M figure is on my could-not-verify list — I name it here only to tell the audience to stop repeating it.</aside>
+  </section>
+
+  <!-- QUIZ 1 -->
+  <section class="slide" data-time="1">
+    <div class="quiz" data-answer="c" data-qid="q-b1">
+      <div class="q">A pharma lead says: "AlphaFold 3 predicts binding affinity, so it replaces our lead-optimisation chemistry." Correct response?</div>
+      <button class="q-opt">Correct — AF3 outputs affinity scores for any ligand</button>
+      <button class="q-opt">Correct, but only for proteins in the AlphaFold DB</button>
+      <button class="q-opt">Wrong on both counts: AF3 predicts complex structures, and at CASP16 it did not significantly beat older methods on pharma-target poses</button>
+      <button class="q-opt">Wrong — AF3 cannot handle ligands at all</button>
+      <div class="q-why">AF3 <b>does</b> model ligand-containing complexes — but structure ≠ affinity. Affinity prediction is the (vendor-claimed) territory of <b>Boltz-2</b>, "FEP-class at ~1000× faster". And the CASP16 pharma-target result is the honest caveat. Three different claims, one sentence apart.</div>
+    </div>
+    <aside class="notes">This is the most common conflation in the room. Reinforce: structure prediction (Nobel), affinity (vendor claim, not independently replicated in my sources), and the wet-lab confirmation loop that neither replaces.</aside>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="slide s-section" data-section="2 · Robots">
+    <div class="num">2</div>
+    <h2>Robots</h2>
+    <p class="sub">Vision-language-action models, and the hours of video they starve for.</p>
+    <aside class="notes">Section 2: the VLA lineage, the data wall, and what a "90% success rate" is actually measuring. End with the price of a humanoid.</aside>
+  </section>
+
+  <!-- VLA -->
+  <section class="slide" data-time="2">
+    <div class="kicker c">the lineage, in four moves</div>
+    <h2>Actions became tokens — then the demo budget became the whole problem</h2>
+    <div class="content" style="margin-top:12px">
+      <table class="t sm">
+        <thead><tr><th>Step</th><th>Model</th><th>What changed</th><th>Data cost</th></tr></thead>
+        <tbody>
+          <tr><td><b>2023</b></td><td>RT-2 · PaLM-E (562B)</td><td>actions emitted <b>as text tokens</b> by a co-fine-tuned VLM → emergent semantic generalisation ("use the stone as a hammer")</td><td>6k evaluation trials; web-scale VLM pretraining</td></tr>
+          <tr><td><b>2025</b></td><td>π0 → π0.5</td><td><b>flow-matching</b> VLA head on a VLM: laundry folding, box assembly. π0.5 co-trained on robots + web does long-horizon cleaning <b>in homes it has never seen</b></td><td>multi-platform teleop corpora</td></tr>
+          <tr><td><b>2025</b></td><td>Gemini Robotics 1.5 + ER 1.5</td><td>embodiment-agnostic reasoning + motion transfer, "<b>think before acting</b>"</td><td>new short-horizon tasks from <b>~100 demos</b></td></tr>
+          <tr class="hl-best"><td><b>2025</b></td><td>Figure Helix</td><td>System 1 / System 2 VLA, whole upper body, <b>two robots collaborating</b>, running on <b>onboard embedded GPUs</b></td><td><b>~500 h</b> teleop — "<b>&lt;5%</b>" of prior VLA dataset sizes</td></tr>
+          <tr><td><b>Open</b></td><td>NVIDIA Isaac GR00T N1</td><td>open humanoid foundation model: VLM + diffusion-transformer head; the reference stack (Isaac Lab/Sim, Cosmos world models) is the shortcut attempt</td><td>real + human video + <b>synthetic</b></td></tr>
+        </tbody>
+      </table>
+      <div class="cols c2" style="margin-top:14px">
+        <div class="card accent-a"><h3>The data wall, in numbers</h3>
+          <p style="font-size:15px"><b>DROID:</b> 76k trajectories · 350 hours · 564 scenes · 50 collectors · 3 continents · 12 months. <b>Open X-Embodiment:</b> 22 robots · 21 institutions · 160,266 tasks. Teleop hours are the labelled data; simulation is the attempted shortcut — <b>nothing published proves sim alone closes the contact-rich gap</b>.</p></div>
+        <div class="card accent-g"><h3>What imitation learning already does</h3>
+          <p style="font-size:15px"><b>ACT / ALOHA (2023):</b> 80–90% success on fine bimanual tasks from <b>10 minutes</b> of demonstrations. <b>Mobile ALOHA (2024):</b> 50 demos + co-training lifts success by up to 90% relative. This is the cheapest capability gain in robotics today.</p></div>
+      </div>
+    </div>
+    <aside class="notes">Sources: RT-2 (arXiv:2307.15818, 6k eval trials), PaLM-E (562B), π0 (RSS 2025) and π0.5 (arXiv:2504.16054), Gemini Robotics and 1.5/ER 1.5 (Oct 2025, ~100 demos), Figure Helix (figure.ai: System1/System2, onboard embedded GPUs, ~500 h, "&lt;5%" of prior dataset sizes), GR00T N1 (arXiv:2503.14734) + Isaac Lab / Cosmos READMEs, DROID and Open X-Embodiment abstracts, ACT/ALOHA and Mobile ALOHA abstracts.</aside>
+  </section>
+
+  <!-- WHAT 90% MEANS -->
+  <section class="slide" data-time="1">
+    <div class="kicker a">what "90% success" means</div>
+    <h2>Dexterity works in the lab; autonomy lasts minutes in the wild. The hardware is already cheap.</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div>
+        <div class="card accent-m"><h3>Read the number before you buy</h3>
+          <ul class="b compact">
+            <li>80–90% is <b>per task, per lab, curated setup</b> — the same object, the same table, the same lighting</li>
+            <li>There is no home-robot equivalent of a multi-camera standard eval; nobody can yet rank two robots on "does the dishes anywhere"</li>
+            <li>π0.5's own claim is generalisation to <b>cleaning tasks in unseen homes</b> — not autonomous living</li>
+            <li>Fragility is measured in <b>minutes to hours</b>: recovery from a bad grasp, a blocked wrist, a confusables drawer</li>
+          </ul></div>
+      </div>
+      <div>
+        <div class="stats" style="grid-template-columns:1fr 1fr">
+          <div class="stat g"><div class="v">$16k</div><div class="l">Unitree G1 humanoid at launch, Aug 2024</div></div>
+          <div class="stat g"><div class="v">$13.5k</div><div class="l">the same class of robot, listed "from" today — hardware is commoditising <b>faster than skills</b></div></div>
+        </div>
+        <div class="callout amb" style="margin-top:16px">The implication for a company: the robot is now a <b>peripheral</b>. The scarce assets are demonstration data, task definition, and a maintenance contract. Buy the skills, not the chassis.</div>
+      </div>
+    </div>
+    <aside class="notes">Success-rate caveats: pi05_abs.html (their own framing), ACT/Mobile ALOHA abstracts. Prices: wikipedia_unitree.html (G1 ~US$16,000, Aug 2024) and the G1 page currently showing "Price from $13.5K". If someone asks about Figure's humanoid pricing: no public price — that is itself an answer about who the customer is.</aside>
+  </section>
+
+  <!-- QUIZ 2 -->
+  <section class="slide" data-time="0.5">
+    <div class="quiz" data-answer="b" data-qid="q-b2">
+      <div class="q">A vendor shows a humanoid folding laundry at 90% success and asks for a pilot. What does that number license you to conclude?</div>
+      <button class="q-opt">It will fold laundry in our facilities at ~90%</button>
+      <button class="q-opt">It reliably performs that task in the demonstrated setup; generalisation is unmeasured</button>
+      <button class="q-opt">It will reach 90% across all household tasks after fine-tuning</button>
+      <button class="q-opt">Success rates are meaningless and should be ignored entirely</button>
+      <div class="q-why">Both extremes are wrong: the number is real and reproducible <b>in its setup</b>, and it says nothing about your rooms. The right ask is a pilot <b>in your environment, on your tasks</b>, with a success definition written down first.</div>
+    </div>
+    <aside class="notes">This generalises beyond robotics — the same discipline applies to any vendor accuracy claim: define the task distribution before accepting a percentage.</aside>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="slide s-section" data-section="3 · Swarms">
+    <div class="num">3</div>
+    <h2>Drone swarms</h2>
+    <p class="sub">Where the AI sits, what breaks it, and who is on the loop.</p>
+    <aside class="notes">Section 3: the control stack (this is the slide that kills the "AI controls the drone" cliché), electronic warfare and spoofing, then the contested kill-chain evidence and a poll.</aside>
+  </section>
+
+  <!-- CONTROL STACK -->
+  <section class="slide" data-time="2">
+    <div class="kicker">the control stack</div>
+    <h2>Five control levels — the LLM is on the second-highest one, not the fast one</h2>
+    <div class="content" style="margin-top:10px">
+      <table class="t sm">
+        <thead><tr><th>Level</th><th>Rate &amp; AI role</th><th>Failure mode</th><th>Safeguard that must exist</th></tr></thead>
+        <tbody>
+          <tr><td><b>Servo / stabilisation</b></td><td>~1 kHz, <b>classical</b> PID / geometric control — no learned model, no LLM</td><td>sensor poisoning, actuator fault</td><td>certified inner loops, flight envelope limits</td></tr>
+          <tr class="hl-warn"><td><b>Perception / terminal homing</b></td><td>10–100 Hz learned vision; Ukraine's FPV shift to onboard edge-AI modules enables homing <b>after total radio loss</b></td><td>adversarial patches, spoofed identifiers, undetected drones</td><td><b>human confirmation before engagement</b></td></tr>
+          <tr><td><b>Mission planning</b></td><td>seconds–minutes; LLM/VLM "agentic" planners (2026 survey literature: arXiv 2607.09756, RALLY, FlyGPT)</td><td>hallucinated plans, goal drift</td><td>dry-run in simulation + operator approval</td></tr>
+          <tr><td><b>Swarm coordination</b></td><td>behaviour trees, market/auction allocation, consensus/flocking</td><td>comms loss → the pre-baked autonomy runs</td><td>an explicit <b>lost-link doctrine</b> written before deployment</td></tr>
+          <tr><td><b>Weapons release</b></td><td>strategic</td><td>escalation faster than any policy loop</td><td>DoD 3000.09 + meaningful human control + the treaty track</td></tr>
+        </tbody>
+      </table>
+      <div class="cols c2" style="margin-top:12px">
+        <div class="card accent-c"><h3>DoD Directive 3000.09, quoted</h3><p style="font-size:15px">An autonomous weapon system is one that, "once activated, can <b>select and engage targets without further intervention by a human operator</b>" — the definition <b>includes</b> supervised systems with an override.</p></div>
+        <div class="card accent-a"><h3>Scale on the record</h3><p style="font-size:15px">DARPA <b>OFFSET</b> targeted swarms of up to <b>250 collaborative autonomous systems</b> for dense-urban operations; the fifth swarm sprint was contracted in April 2020.</p></div>
+      </div>
+    </div>
+    <aside class="notes">Sources: the agentic UAV-swarm survey cluster (arXiv:2607.09756; RALLY 2507.01378; PrivLLMSwarm 2512.06747; FlyGPT 2404.07844) for "LLM at mission level"; behaviour-tree survey (arXiv:1709.00084); market-based SAR replanning (arXiv:2606.01970); FPV edge-AI terminal homing after radio loss from the FPV article (an electronic-warfare adaptation); DoD 3000.09 definition and the human-in/on/out-of-the-loop taxonomy via the lethal-autonomy article; OFFSET 250-system figure from the DARPA news archive (the program page itself 404s — noted in the claim audit).</aside>
+  </section>
+
+  <!-- EW -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker m">the soft kill: spoofing</div>
+    <h2>Before you outsource autonomy, know that position itself can be forged</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div>
+        <ul class="b compact">
+          <li><b>2011:</b> a US RQ-170 was captured — assessment: likely by <b>GPS spoofing</b>, not a hack of the aircraft</li>
+          <li><b>2017:</b> ~20 ships in the Black Sea displayed positions placing them at an airport; traced to GPS interference (Humphreys' analysis)</li>
+          <li><b>By 2026:</b> Lloyd's List reporting of <b>intense GNSS spoofing</b> around the Black Sea, Sea of Azov, Baltic and Red Sea — now a routine hazard for civilian shipping</li>
+          <li><b>The detectors are attackable too:</b> adversarial RF attacks against RF-based drone detection (arXiv 2512.20712); adversarial patches defeat aerial visual detection (arXiv 2008.13671)</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card accent-m"><h3>Engineering consequences</h3>
+          <ul class="b compact">
+            <li>Position is <b>not</b> a trusted input. Multi-source PNT + consistency checks, or you inherit someone else's map</li>
+            <li>GPS-denied autonomy (LiDAR/vision SLAM) is a <b>security</b> feature, not a demo feature</li>
+            <li>Lost-link behaviour is a <b>policy</b>: what may it still do, for how long, toward what?</li>
+            <li>Every perception model you depend on can be adversarially patched — assume detection recall degrades under opposition</li>
+          </ul></div>
+      </div>
+    </div>
+    <aside class="notes">Spoofing incidents and dates via the GPS-spoofing article (RQ-170, 2017 Black Sea with Todd Humphreys' analysis, 2026 Lloyd's List reporting); adversarial attacks via arXiv:2512.20712 and arXiv:2008.13671; GPS-denied navigation survey arXiv:2509.10730. Same argument as the guardrails deck: the identity of your inputs is part of your threat model — here the input is "where am I".</aside>
+  </section>
+
+  <!-- KILL CHAIN -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker mag">the contested kill chain</div>
+    <h2>The evidence that autonomous drones have already killed is genuinely disputed — and that is the lesson</h2>
+    <div class="cols c21" style="margin-top:16px">
+      <div>
+        <ul class="b compact">
+          <li><b>24 Aug 2026, NYT:</b> "A Drone Killed Three Ukrainians. It Was Guided by A.I."</li>
+          <li><b>June 2026, New Scientist</b> (citing a Ukrainian defense-industry figure): fully autonomous "Terminator" drones killed soldiers around 2024 — reportedly a first</li>
+          <li><b>May 2026, Al Jazeera</b> counters that <b>humans remain in control</b> of current operations</li>
+          <li>Drones are credited with roughly <b>70% of casualties</b> in that war — a single attribution, so treat it as an order of magnitude</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card accent-m"><h3>Two facts, one gap</h3>
+          <p style="font-size:15px"><b>Deployment:</b> terminal autonomy after radio loss is documented and spreading.<br><b>Governance:</b> UN Secretary-General and the ICRC called for binding treaty negotiations to conclude by <b>end-2026</b>; the UNGA voted <b>166–3–15</b> in Dec 2024; the CCW process has been meeting since <b>2014</b> without a mandate.</p></div>
+        <div class="callout amb" style="margin-top:14px">Capability is outrunning the negotiating room. Say the disputed part out loud: <b>we cannot verify the first autonomous kill, and we should not pretend we can</b>.</div>
+      </div>
+    </div>
+    <aside class="notes">All four items come from the lethal-autonomy article's sourcing (NYT 2026-08-24; New Scientist June 2026; Al Jazeera May 2026; the ~70% casualty figure flagged as single attribution in my claim audit). UN/ICRC and the vote via the killer-robots and CCW articles. Present this as contested evidence, not a settled fact — that is the honest version and it is more persuasive.</aside>
+  </section>
+
+  <!-- POLL -->
+  <section class="slide" data-time="0.5">
+    <div class="poll" data-pid="p-futures">
+      <h3>Which control would you fund first, if only one?</h3>
+      <div class="p-opt"><div class="p-head"><span>Screening &amp; dual-use review (bio, orders)</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>Tiered access + pre-release capability evals</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>Lost-link / engagement doctrine for autonomy</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>Provenance &amp; labelling of synthetic content</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="hint">Tap a bar. Counts live in this page only.</div>
+    </div>
+    <aside class="notes">Then say the punchline of the next section: the dial shows these are not a menu you pick one from — the dystopia branch is what happens when you fund exactly one and call it a strategy.</aside>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="slide s-section" data-section="4 · Two futures">
+    <div class="num">4</div>
+    <h2>The two futures</h2>
+    <p class="sub">Both are already underway, and both have citations.</p>
+    <aside class="notes">Section 4: dystopia with sources, utopia with sources, then the interactive dial that makes the tradeoff visible.</aside>
+  </section>
+
+  <!-- DYSTOPIA -->
+  <section class="slide" data-time="2">
+    <div class="kicker mag">dystopia, sourced</div>
+    <h2>The real dystopia is banal: scorekeeping, base rates, and content nobody can verify</h2>
+    <div class="content" style="margin-top:10px">
+      <table class="t sm">
+        <thead><tr><th>Mechanism</th><th>Documented instance</th><th>The honest version</th></tr></thead>
+        <tbody>
+          <tr><td><b>Scorekeeping</b></td><td>China's system in evidence: blacklists + credit reporting, <b>990M</b> citizen financial records, the courts' judgment-defaulter blacklist, Sesame Credit docking points for unpaid fines</td><td>The "one unified behaviour score" story is a <b>widespread misconception</b>. The reality — many partial scores wired to enforcement — is <b>worse and more banal</b> than the myth</td></tr>
+          <tr><td><b>Predictive policing</b></td><td>ProPublica 2016: <b>7,000+</b> COMPAS scores checked over 2 years in Broward County FL; 61% of "likely to re-offend" were rearrested</td><td>Modately valid <b>and</b> unfair: black defendants were <b>77% more likely</b> to be flagged higher-risk for future violence and mislabelled at ~2× the rate; white defendants under-flagged. The fairness tradeoffs are provably mutually exclusive</td></tr>
+          <tr><td><b>Labour</b></td><td>Goldman Sachs (Mar 2023): ~<b>300M</b> full-time jobs <b>exposed</b>; two-thirds of US occupations "complemented rather than substituted"</td><td>Acemoglu (NBER w32487): <b>≤0.66%</b> cumulative TFP over 10 years, likely <b>&lt;0.53%</b>, because the hard-to-learn tasks come last — and the capital/labour gap widens. <b>Exposure is not unemployment</b></td></tr>
+          <tr><td><b>Epistemic collapse</b></td><td>Deepfake audio of the UK Labour leader released on conference day (Oct 2023); US state secretaries' open letter (Aug 2024) about a video generator spreading election misinformation</td><td>Answered in law, not vibes: AI Act <b>Article 50</b> transparency duties for synthetic content from Aug 2026</td></tr>
+          <tr><td><b>Concentration</b></td><td>One lab valued at <b>$380B</b> (Feb 2026), then ~<b>$965B</b> (May 2026); US chip export controls since Oct 2022; a frontier model <b>rationed to ~100 vetted partners</b> (June 2026)</td><td>Compute governance is no longer hypothetical — a state has already rationed access to a model</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <aside class="notes">Social credit: wikipedia_social_credit.html — note it explicitly flags the unified-score narrative as a misconception, which is why I use the mechanism. COMPAS: ProPublica (Northpoints/Bursztyn). Labour: Briggs &amp; Kodnani, Goldman Sachs, Mar 2023 vs Acemoglu NBER w32487 — present both, they measure different things. Deepfakes: wikipedia_deepfake.html. Concentration: wikipedia_anthropic.html (valuation rounds; the June 2026 suspension and reinstatement to ~100 trusted partners), wikipedia_china_ai_reg.html (Oct 2022 controls). The 2024 Slovak "honeypot" audio incident is on my could-not-verify list, so it is not on this slide.</aside>
+  </section>
+
+  <!-- UTOPIA -->
+  <section class="slide" data-time="2">
+    <div class="kicker grn">utopia, also sourced — with its rebuttals</div>
+    <h2>The good future is measured too, and every row has an access problem attached</h2>
+    <div class="content" style="margin-top:10px">
+      <table class="t sm">
+        <thead><tr><th>Win</th><th>Measured</th><th>The rebuttal you must answer</th></tr></thead>
+        <tbody>
+          <tr><td><b>Science acceleration</b></td><td>AlphaFold DB: <b>23–32%</b> more research on previously structure-less proteins; GNoME: <b>2.2M</b> candidate crystals, 736 already synthesized</td><td>Benefits flow to whoever has compute and pipelines — and the Nobel team was still disbanded</td></tr>
+          <tr><td><b>Weather</b></td><td>GraphCast: 10-day global forecast in <b>&lt;1 min</b>, beating the best operational deterministic system on <b>90%</b> of 1,380 targets; GenCast beats the ECMWF ensemble on <b>97.2%</b> of 1,320</td><td>These are corporate-run public utilities trained on <b>public</b> reanalysis. Who pays when support ends?</td></tr>
+          <tr><td><b>Control of hard systems</b></td><td>DeepMind + EPFL: reinforcement learning controlling <b>tokamak plasma</b> magnetic shaping (TCV), Nature 2022</td><td>A demo is not a power plant; timelines are owned by private fusion capital</td></tr>
+          <tr><td><b>Medicine</b></td><td>AlphaMissense classifies <b>89%</b> of missense variants — a direct clinical-interpretation lever; an AI-designed TNIK inhibitor through Phase 2a</td><td>Oncology's 3.4% base rate and trial economics mean <b>access ≠ approval</b>, and per-dose pricing excludes the poor unless forced</td></tr>
+          <tr><td><b>Education</b></td><td>Khan Academy panel of <b>&gt;200,000 students</b> (PNAS 2026): 6.6 h/year of practice ≈ <b>+0.031 SD</b> in maths</td><td>Real and tiny at low usage; tutoring-as-privilege. RCT effect sizes don't headline</td></tr>
+          <tr><td><b>Accessibility &amp; fields</b></td><td>Be My Eyes "Be My AI": <b>1M</b> image descriptions within weeks, 10M+ volunteers; Deere/See &amp; Spray sprays only weeds</td><td>Platform dependence, and herbicide reduction priced in capex favours large farms — smallholders excluded</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <aside class="notes">GraphCast (Science 2023) and GenCast (Nature 2024) figures are as published; GNoME Nature 2023; tokamak Nature 2022 (TCV, with EPFL); AlphaMissense Science 2023; Khan PNAS 2026 panel — note the pilot-era claims (Khanmigo, Mar 2023, ~65k students, 53 districts) were much looser than this; Be My AI (GPT-4, Mar 2023) and Deere/Blue River via their articles. The discipline of this slide is the third column: every utopia row has a distribution answer, and "the model got better" is not one.</aside>
+  </section>
+
+  <!-- WIDGET -->
+  <section class="slide" data-time="2">
+    <div class="kicker vio">live demo · the futures dial</div>
+    <h2>Five levers. Toggle them and watch which future you are actually buying.</h2>
+    <div data-widget="future-dial" style="margin-top:10px">
+      <noscript><p class="dim">Demo needs JavaScript.</p></noscript>
+    </div>
+    <aside class="notes">How to drive it: start at "nothing deployed" — the dystopia bar is high and the utopia bar is only modestly high, because ungoverned capability still does good things <b>and</b> the harms are what get scaled. Turn on screening and dual-use review: bio harm falls, research speed falls a little (the 23–32% floodlight is the thing you're slowing). Add tiered access: CBRN-ish risk falls further, but note the cost — access rationing is itself a concentration risk (the June 2026 vetted-partner episode). Turn on doctrine: swarm/robot incident risk drops sharply and cheaply — the cheapest lever on the panel, which is an argument. Turn on provenance/labelling: epistemic harm falls but only if enforcement exists. Finally "distributed ownership" is the one that raises utopia rather than lowering dystopia. Close with: <b>the dial is a scenario model, not a forecast</b> — every weight is a judgment, the levers and their mechanisms are sourced.</aside>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="slide s-section" data-section="5 · What decides it">
+    <div class="num">5</div>
+    <h2>What decides which one</h2>
+    <p class="sub">Three jurisdictions, and a checklist you can start on Monday.</p>
+    <aside class="notes">Section 5: the regulatory map, the org-level checklist, the last quiz, and the recap.</aside>
+  </section>
+
+  <!-- BRIDGE -->
+  <section class="slide" data-time="2">
+    <div class="kicker">three jurisdictions, three styles</div>
+    <h2>Statute, deal, and licence — and a checklist that works under all three</h2>
+    <div class="cols c3" style="margin-top:16px">
+      <div class="card accent-c"><h3>EU — statute</h3>
+        <ul class="b compact">
+          <li>AI Act in force <b>1 Aug 2024</b>; prohibitions (incl. social-scoring recital) from <b>2 Feb 2025</b></li>
+          <li>GPAI obligations <b>2 Aug 2025</b>; high-risk + Article 50 transparency <b>2 Aug 2026/27</b></li>
+          <li>Fines up to <b>€35M / 7%</b> of turnover</li>
+          <li>Known weakness: heavy <b>provider self-assessment</b>, few third-party audits</li>
+        </ul></div>
+      <div class="card accent-a"><h3>US — deal</h3>
+        <ul class="b compact">
+          <li>"Restoring Gold Standard Science" EO (May 2025) and the <b>Genesis Mission</b> (24 Nov 2025): DOE AI-for-science, Argonne hosting two AI supercomputers with NVIDIA and Oracle</li>
+          <li>Government-lab evaluation MOUs (2024) and <b>direct model access controls</b> (2026)</li>
+          <li>Governs by contract and access, not statute</li>
+        </ul></div>
+      <div class="card accent-v"><h3>China — licence</h3>
+        <ul class="b compact">
+          <li>CAC <b>Interim Measures for Generative AI</b> (Jul 2023)</li>
+          <li>Deep-synthesis labelling rules effective <b>Jan 2023</b></li>
+          <li><b>117</b> models approved by Apr 2024; training-data safety documentation (2025)</li>
+          <li>With US chip export controls cutting the other way since Oct 2022</li>
+        </ul></div>
+    </div>
+    <div class="callout grn" style="margin-top:18px">Your five, regardless of jurisdiction: <b>tiered model access</b> · <b>pre-release capability evals against a public rubric</b> · <b>order screening + incident logging</b> · <b>a written lost-link / engagement doctrine</b> before any autonomous hardware moves · <b>provenance on generated content</b>. Each is mirrored by practice already on the record.</div>
+    <aside class="notes">AI Act dates and fines: wikipedia_ai_act.html + the implementation timeline; the self-assessment weakness is the documented critique. US: EO (May 2025) title verified, Genesis Mission via its article (Argonne + NVIDIA + Oracle); MOUs and the 2026 access episode via the Anthropic article. China: wikipedia_china_ai_reg.html (CAC interim measures, deep-synthesis rules, 117 approved models by Apr 2024). Note for honesty: the body text of EO 14316 was not reachable locally, so I describe only the Genesis Mission and the EO list entry.</aside>
+  </section>
+
+  <!-- QUIZ 3 -->
+  <section class="slide" data-time="1">
+    <div class="quiz" data-answer="a" data-qid="q-b3">
+      <div class="q">Under DoD Directive 3000.09, which system counts as an autonomous weapon system?</div>
+      <button class="q-opt">One that, once activated, can select and engage targets without further human intervention — including a supervised system with an override</button>
+      <button class="q-opt">Only a system with no human supervisor at all</button>
+      <button class="q-opt">Any drone that uses machine learning for navigation</button>
+      <button class="q-opt">Only systems deployed by a state actor</button>
+      <div class="q-why">The definition deliberately includes <b>human-on-the-loop</b> systems with override. So "our operator can always abort" does <b>not</b> take a programme out of the autonomous-weapon category — a fact most vendor slides get wrong.</div>
+    </div>
+    <aside class="notes">Wording quoted via the lethal-autonomy article's summary of DoDD 3000.09. If pushed on the human-in/on/out-of-the-loop taxonomy, credit the Human Rights Watch / Steve Docherty framing (2012).</aside>
+  </section>
+
+  <!-- RECAP -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">recap</div>
+    <h2>Five things to remember</h2>
+    <div class="content" style="margin-top:12px">
+      <ul class="b">
+        <li><b>Prediction is free; the wet lab is not.</b> 200M structures and a 23–32% research floodlight — and design still needs 10,000 candidates to find a hit.</li>
+        <li><b>Robotics' bottleneck is demonstration hours</b>, not the network: 10 minutes of teleop already buys 80–90% on a narrow task, and a humanoid costs less than a car.</li>
+        <li><b>In a swarm, AI is at mission level,</b> not the servo — and the fast failure modes are forged position and pre-baked lost-link autonomy.</li>
+        <li><b>Both futures are already running, with citations.</b> COMPAS and GraphCast are the same kind of artifact: powerful, measured, and distributed unequally.</li>
+        <li><b>The controls are the story.</b> Screening, tiers, doctrine, provenance, ownership — capability curves don't choose; procurement and policy do.</li>
+      </ul>
+      <div class="chiprow" style="margin-top:18px"><span class="chip">quiz score: <b data-score>–</b></span><span class="chip g">AlphaFold → Boltz</span><span class="chip c">ALOHA 10 min</span><span class="chip m">spoofed PNT</span><span class="chip a">UNGA 166–3–15</span><span class="chip v">the dial</span></div>
+    </div>
+    <aside class="notes">Claim audit, the ❌ items I refused to state (Insilico's "$2.6M", Isomorphic's deal totals, ESM3, EVE, A-Lab, the Slovak deepfake, CDAO quotes) and the contested ones (first autonomous kill, the ~70% casualty attribution) are all listed in research/notes/bio-robots-futures.md. Ask me about any number and I'll show the file.</aside>
+  </section>
+
+</div>
+<script>
+/* ---- futures dial ---- */
+window.DeckWidgets = window.DeckWidgets || {};
+window.DeckWidgets["future-dial"] = function (el) {
+  /* A scenario model, NOT a forecast. Levers and their mechanisms are sourced
+     (see the deck notes); the numeric weights are my judgment, deliberately
+     visible so the audience can argue with them. */
+  var LEVERS = [
+    { id: "screen", label: "Screening + dual-use review", sub: "DNA-order screening, publication review",
+      harmBio: -34, harmRob: 0, harmEpi: 0, harmConc: -2, speed: -12, note: "AISI (Dec 2025): novices + an LLM succeeded at hard wet-lab tasks; plasmid design 'weeks to days'. Screening is the only lever that touches that path — and it is older than GenAI." },
+    { id: "tiers", label: "Tiered access + pre-release evals", sub: "ASL-style tiers, capability tests",
+      harmBio: -22, harmRob: -6, harmEpi: -6, harmConc: +14, speed: -8, note: "Anthropic ASL tiers modelled on biosafety levels; June 2026: a frontier model withheld, then reinstated to ~100 vetted partners. Rationing works — and rationing concentrates." },
+    { id: "doctrine", label: "Lost-link / engagement doctrine", sub: "what autonomy survives a jam",
+      harmBio: 0, harmRob: -38, harmEpi: -4, harmConc: 0, speed: -2, note: "DoDD 3000.09 covers supervised-with-override systems too. FPV terminal homing after total radio loss is already deployed; a written lost-link rule is nearly free." },
+    { id: "prov", label: "Provenance & labelling", sub: "AI Act Art. 50, C2PA-style signing",
+      harmBio: -2, harmRob: 0, harmEpi: -32, harmConc: -3, speed: -3, note: "Answer to the Oct-2023 conference-day deepfake and the Aug-2024 state-secretaries letter. Only works with enforcement — labelling a thing nobody checks is theatre." },
+    { id: "own", label: "Distributed ownership", sub: "public compute, open weights w/ guardrails, procurement spread",
+      harmBio: -6, harmRob: -8, harmEpi: -10, harmConc: -30, speed: +18, note: "The only lever that RAISES the utopia bar rather than lowering the harm bar: Boltz (MIT), Chai (Apache-2.0), open robot stacks — against a $965B valuation and export-controlled compute." }
+  ];
+  var BASE = { bio: 62, rob: 55, epi: 66, conc: 58 };
+  var st = { on: {}, preset: "none" };
+
+  el.innerHTML =
+    '<div class="calc">' +
+      '<div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">' +
+          '<button class="btn ghost fd-p" data-p="none">nothing deployed</button>' +
+          '<button class="btn ghost fd-p" data-p="one">one lever (what polls pick)</button>' +
+          '<button class="btn ghost fd-p" data-p="all">all five</button>' +
+        '</div>' +
+        '<div id="fd-levers"></div>' +
+      '</div>' +
+      '<div>' +
+        '<div class="bars" id="fd-bars"></div>' +
+        '<div class="readout" id="fd-out" style="margin-top:12px;font-size:13.5px"></div>' +
+      '</div>' +
+    '</div>';
+
+  var lv = el.querySelector("#fd-levers");
+  LEVERS.forEach(function (L) {
+    var b = document.createElement("button");
+    b.className = "btn ghost";
+    b.style.cssText = "display:block;width:100%;text-align:left;margin-bottom:7px;padding:8px 12px";
+    b.innerHTML = '<b>' + (L.id === "own" ? "▲ " : "○ ") + '</b>' + L.label +
+      '<span style="display:block;font:400 12px var(--font-mono);color:var(--txt-3);margin-top:2px">' + L.sub + '</span>';
+    b.addEventListener("click", function () { st.on[L.id] = !st.on[L.id]; st.preset = "custom"; render(); });
+    L._btn = b;
+    lv.appendChild(b);
+  });
+
+  function totals() {
+    var t = { bio: BASE.bio, rob: BASE.rob, epi: BASE.epi, conc: BASE.conc, speed: 100, notes: [] };
+    LEVERS.forEach(function (L) {
+      if (!st.on[L.id]) return;
+      t.bio += L.harmBio; t.rob += L.harmRob; t.epi += L.harmEpi; t.conc += L.harmConc; t.speed += L.speed;
+      t.notes.push(L.note);
+    });
+    ["bio", "rob", "epi", "conc", "speed"].forEach(function (k) { t[k] = Math.max(4, Math.min(100, t[k])); });
+    return t;
+  }
+
+  function render() {
+    LEVERS.forEach(function (L) {
+      var on = !!st.on[L.id];
+      L._btn.className = "btn " + (on ? "g" : "ghost");
+      L._btn.style.cssText = "display:block;width:100%;text-align:left;margin-bottom:7px;padding:8px 12px";
+      L._btn.innerHTML = '<b>' + (on ? "✓ " : (L.id === "own" ? "▲ " : "○ ")) + '</b>' + L.label +
+        '<span style="display:block;font:400 12px var(--font-mono);color:var(--txt-3);margin-top:2px">' + L.sub + '</span>';
+    });
+    var t = totals();
+    var dyst = Math.round((t.bio + t.rob + t.epi + t.conc) / 4);
+    var uto = Math.round(t.speed * 0.62 + (100 - dyst) * 0.38);
+
+    var rows = [
+      { l: "bio misuse pressure", v: t.bio, c: "m" },
+      { l: "robot / swarm incident risk", v: t.rob, c: "m" },
+      { l: "epistemic damage", v: t.epi, c: "a" },
+      { l: "concentration of capability", v: t.conc, c: "a" },
+      { l: "research & deployment speed", v: t.speed, c: "g" },
+      { l: "DYSTOPIA INDEX", v: dyst, c: "m" },
+      { l: "UTOPIA INDEX", v: uto, c: "g" }
+    ];
+    el.querySelector("#fd-bars").innerHTML = rows.map(function (r) {
+      return '<div class="bar ' + r.c + '" style="--w:' + r.v + '%"><span>' + r.l + '</span>' +
+             '<div class="track"><div class="fill" style="width:' + r.v + '%"></div></div>' +
+             '<span class="val">' + r.v + '</span></div>';
+    }).join("");
+
+    var verdict = dyst > 57 ? "capability scaled faster than institutions"
+                : dyst > 42 ? "partial governance: harms move to the ungoverned seam"
+                : "governed deployment — if enforcement is funded";
+    el.querySelector("#fd-out").innerHTML =
+      '<b>' + Object.keys(st.on).filter(function (k) { return st.on[k]; }).length + ' / 5 levers deployed</b> — ' + verdict +
+      '<div style="margin-top:6px">' + (t.notes[0] || "No levers: harms are limited only by whoever can buy the hardware and the wet lab.") + '</div>' +
+      (t.notes.length > 1 ? '<div style="color:var(--txt-3);margin-top:4px">+ ' + (t.notes.length - 1) + ' more mechanism' + (t.notes.length > 2 ? "s" : "") + ' in the notes</div>' : '') +
+      '<div style="color:var(--txt-3);margin-top:6px">scenario model, not a forecast · levers and mechanisms sourced, weights are judgment — argue with them</div>';
+  }
+
+  el.querySelectorAll(".fd-p").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var p = b.getAttribute("data-p");
+      st.on = {};
+      if (p === "one") st.on.doctrine = true;
+      if (p === "all") LEVERS.forEach(function (L) { st.on[L.id] = true; });
+      st.preset = p;
+      render();
+    });
+  });
+
+  render();
+};
+</script>
+<script src="../template/widgets.js"></script>
+<script src="../template/deck.js"></script>
+</body>
+</html>

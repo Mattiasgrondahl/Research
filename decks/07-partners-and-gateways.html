@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partners &amp; Gateways</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../template/deck.css">
+</head>
+<body data-brand="PARTNERS · GATEWAYS" data-title="Which AI Partner — and How You Leave" data-duration="30">
+<div id="stage">
+
+  <!-- TITLE -->
+  <section class="slide s-title" data-time="0.5">
+    <div class="kicker amb">30-minute procurement brief</div>
+    <h1>Partners &amp; gateways:<br><span class="grad-text">buy a contract you can burn down</span></h1>
+    <p class="sub">Microsoft, Google, Anthropic, Mistral, AWS, Nvidia, GLM, Kimi, Qwen — plus OpenRouter and Japan's Fugu. Who to partner with, what it costs, and how fast you can leave.</p>
+    <div class="meta"><span>list prices, all fetched 2026-09-04</span><span>live partner/rollback simulator</span><span>no invented numbers</span></div>
+    <aside class="notes">Every figure on this deck was pulled from an official pricing page or pricing API on 2026-09-04 and is tagged in research/notes/vendor-gateway-partnership.md ([AZ-55] [GO-P] [AWS-B] [AN-P] [SA-F] [KO-K3] [ZAI] [MI-P] [PK] [OR-F]). Where a vendor claims something I could not independently check, the slide says "vendor-claimed".</aside>
+  </section>
+
+  <!-- THESIS -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">the thesis</div>
+    <h2>You are not buying a model. You are buying where the tokens are processed, what is retained, and how fast you can leave</h2>
+    <div class="stats" style="margin-top:20px">
+      <div class="stat"><div class="v">$5 / $30</div><div class="l">the frontier band: GPT-5.5, GPT-5.6-sol and Sakana <b>Fugu Ultra</b> all sit here per 1M tokens</div></div>
+      <div class="stat g"><div class="v">$0.15</div><div class="l">per 1M input for <b>gpt-oss-120b on Bedrock</b> — a 33× spread inside the same cloud contract</div></div>
+      <div class="stat a"><div class="v">2027-01-01</div><div class="l">the <b>published date</b> Gemini 3.8 Flash doubles: $0.75→$1.50 in, $3.75→$7.50 out</div></div>
+      <div class="stat v"><div class="v">427</div><div class="l">models live on <b>OpenRouter</b> in one API, one invoice, 5.5% fee on credits</div></div>
+    </div>
+    <div class="callout grn" style="margin-top:16px">Quality has converged enough that the 2026 decision is <b>price tier × compliance × exit cost</b>. So: dual-source, route through a gateway you control, pin versions, keep an open-weight exit — and treat every discount as arithmetic, not loyalty.</div>
+    <aside class="notes">Prices: Azure Retail Prices API for Foundry Models (GPT-5.5 $5/$30 global, cached $0.50, batch $2.50/$15, PP priority 2.5× = $12.50/$75) [AZ-55]; Sakana Fugu Ultra $5/$30, cached $0.50 [SA-F]; gpt-oss-120b $0.15/$0.60 on Bedrock us-east-1 [AWS-B]; Gemini 3.8 Flash schedule [GO-P]; OpenRouter model count = one snapshot of /api/v1/models, 2026-09-04 [OR-M].</aside>
+  </section>
+
+  <!-- AGENDA -->
+  <section class="slide" data-time="1">
+    <div class="kicker">agenda</div>
+    <h2>30 minutes, five stops</h2>
+    <div class="content" style="margin-top:12px">
+      <div class="ag-row"><div class="n">1</div><div><h3>The field</h3><p>six sellers, four business models, one naming trap</p></div><span class="min">4 min</span></div>
+      <div class="ag-row"><div class="n">2</div><div><h3>Money</h3><p>the price sheet, worked math, discount arithmetic</p></div><span class="min">6 min</span></div>
+      <div class="ag-row"><div class="n">3</div><div><h3>Gateways</h3><p>OpenRouter, Fugu, and what a gateway never buys you</p></div><span class="min">5.5 min</span></div>
+      <div class="ag-row"><div class="n">4</div><div><h3>Choosing</h3><p>procurement grid + live partner simulator</p></div><span class="min">4.5 min</span></div>
+      <div class="ag-row"><div class="n">5</div><div><h3>Leaving</h3><p>lock-in inventory and the rollback playbook</p></div><span class="min">5 min</span></div>
+    <small class="src">Slide budgets below total <b>28 min</b> of the 30-minute slot — the rest is your buffer for questions; the timer (T) counts the whole slot.</small>
+    </div>
+    <aside class="notes">The simulator is at minute ~20. Everything before it exists so the simulator's numbers are defensible.</aside>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="slide s-section" data-section="1 · The field">
+    <div class="num">1</div>
+    <h2>The field</h2>
+    <p class="sub">Four business models are hiding behind six brand names.</p>
+    <aside class="notes">Section 1 is short by design: get the taxonomy straight, flag the Chinese shelf that already sits inside Western contracts, and correct the name people will get wrong.</aside>
+  </section>
+
+  <!-- SIX SELLERS -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker">the map</div>
+    <h2>Six sellers, four business models</h2>
+    <div class="content" style="margin-top:12px">
+      <table class="t sm">
+        <thead><tr><th>Seller</th><th>Business model</th><th>Flagship &amp; list price / 1M</th><th>What you actually sign</th></tr></thead>
+        <tbody>
+          <tr><td><b>Microsoft</b><br>Foundry / Azure OpenAI</td><td>Cloud platform reselling its own + others' models, Azure SLA &amp; invoice</td><td>GPT-5.5 <b>$5/$30</b> · 5.6-terra $2/$12 · mini $0.25/$2 · GPT-6 "astra" in preview (2026-09-03) [AZ-55][AZ-M]</td><td>Azure agreement, EA discount, PTU capacity, Data Zone +10%, Claude via Marketplace CCUs</td></tr>
+          <tr><td><b>Google</b><br>Vertex / Gemini API</td><td>Same, with the aggressive per-token ladder and dated repricing</td><td>3.8 Flash <b>$0.75/$3.75 → $1.50/$7.50 on 2027-01-01</b> · 3.1 Pro prev $2/$12 [GO-P]</td><td>VCRC/CUD commit; paid tier = "not used to improve products"; Flex/Priority/Batch</td></tr>
+          <tr><td><b>AWS</b><br>Bedrock</td><td>One IAM contract over <b>everyone's</b> models, incl. Chinese and open weights</td><td>Kimi K2.5 <b>$0.60/$3.00</b> · GLM-5 $1.00/$3.20 · Qwen3-Coder $0.45/$1.80 · gpt-oss-120b $0.15/$0.60 [AWS-B]</td><td>AWS contract + IAM; regional/multi-region endpoints +10%; batch/flex ≈−50%, priority ≈+75%</td></tr>
+          <tr><td><b>Anthropic</b><br>first-party</td><td>Model vendor selling direct — and through all three clouds</td><td>Fable 5.1 <b>$10/$50</b> · Opus 5 $5/$25 · Sonnet 5 $2/$10 · Haiku 4.5 $1/$5 [AN-P]</td><td>Direct DPA/ZDR terms; <b>Covered Models force 30-day retention, no ZDR</b> [AN-R]</td></tr>
+          <tr><td><b>Mistral</b><br>La Plateforme</td><td>European vendor: cheap open weights + hosted + VPC/on-prem</td><td>Mistral Large <b>$0.50/$1.50</b>; batch −50%, cached input up to −90% (vendor "up to") [MI-P]</td><td>EU data residency, ZDR offering, SAML, dedicated/self-hosted deployment</td></tr>
+          <tr><td><b>Nvidia</b><br>NIM / Dynamo</td><td>Doesn't sell tokens — sells the way <b>you</b> sell tokens to yourself</td><td>no per-token list price; claims GB300 NVL72 + Dynamo <b>up to 50×</b> MoE throughput vs Hopper (vendor benchmark) [NV-D]</td><td>GPU purchase/lease + your power bill + your on-call rota</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <aside class="notes">Azure prices from the Azure Retail Prices API (Foundry Models, global SKU) 2026-09-04; PTU is $312/PTU/month [AZ-PTU]. Bedrock numbers from the machine-readable pricing offer index for us-east-1 [AWS-B]. Anthropic [AN-P], Mistral [MI-P], Nvidia Dynamo page [NV-D]. Note the structural point rather than the numbers: three of these are clouds, two are model vendors, one is a hardware company — and only the model vendors can actually promise you model behaviour.</aside>
+  </section>
+
+  <!-- CHINESE SHELF + NAMING -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker vio">the shelf nobody puts on the slide</div>
+    <h2>The Chinese models are already inside your Western contract</h2>
+    <div class="cols c21" style="margin-top:14px">
+      <div>
+        <table class="t sm">
+          <thead><tr><th>Vendor / model</th><th>First-party</th><th>On AWS Bedrock (us-east-1)</th></tr></thead>
+          <tbody>
+            <tr><td><b>Z.ai (Zhipu) GLM</b></td><td>GLM-5.3 $1.40/$4.40, cached $0.26 · GLM-5 $1/$3.2 [ZAI]</td><td>GLM-5 <b>$1.00/$3.20</b>, flex/priority tiers apply [AWS-B]</td></tr>
+            <tr><td><b>Moonshot (Kimi)</b></td><td>K3 <b>$3.00 in / $15 out</b>, cache-hit $0.30, <b>1,048,576-token</b> context [KO-K3]</td><td>K2.5 <b>$0.60/$3.00</b> (flex $0.30/$1.50) [AWS-B]</td></tr>
+            <tr><td><b>Alibaba Qwen</b></td><td>qwen3.8-max $2/$6; cache write 125%, hit 10%; batch −50% (never stacks with cache) [ALI]</td><td>Qwen3-Coder-480B $0.45/$1.80; Qwen3-235B $0.22/$0.88 [AWS-B]</td></tr>
+            <tr><td><b>DeepSeek</b></td><td>v3.2 widely self-hosted</td><td>v3.2 $0.62/$1.85 [AWS-B]</td></tr>
+          </tbody>
+        </table>
+        <div class="callout vio" style="margin-top:14px">Procurement consequence: you can get a Chinese frontier model <b>behind your existing AWS IAM, DPA and invoice</b>. That changes the risk conversation from "may we use a Chinese model?" to "may we use this model ID in this region?"</div>
+      </div>
+      <div>
+        <div class="card accent-m"><div class="ico">⚠</div><h3>Name it right</h3>
+          <ul class="b compact">
+            <li><b>"Moonshine"</b> = an open-source <b>on-device speech</b> toolkit, not an LLM vendor [MOON]</li>
+            <li>The LLM vendor is <b>Moonshot AI / Kimi</b></li>
+            <li><b>"Fugu"</b> = <b>Sakana AI</b>'s orchestrator, not ABEJA's older Fugu family [SA-F]</li>
+            <li><b>GLM</b> = Zhipu, now branded <b>Z.ai</b></li>
+          </ul>
+        </div>
+        <div class="callout" style="margin-top:12px">Say the wrong name in a steering meeting and you lose the room for five minutes.</div>
+      </div>
+    </div>
+    <aside class="notes">Bedrock prices are from the AWS pricing offer index; Moonshot K3 pricing page [KO-K3]; Z.ai pricing docs [ZAI]; Alibaba Model Studio pricing [ALI]; Moonshine README [MOON]. Full wording if pressed: Moonshine's README says it "runs on-device… no account or API keys" — a speech toolkit with no LLM product line; and no source I fetched supports reading "Fugu" as ABEJA's older Fugu family rather than Sakana's orchestrator [SA-F][HN-S]. Also be ready for: "are these approved?" — the honest answer is that Bedrock hosting gets you the AWS compliance boundary, not the model vendor's certifications, which I could not verify for Moonshot or Z.ai (see the note's could-not-verify list).</aside>
+  </section>
+
+  <!-- QUIZ 1 -->
+  <section class="slide" data-time="1">
+    <div class="quiz" data-answer="c" data-qid="q-p1">
+      <div class="q">Same model, same cloud, same day. Which of these is <em>not</em> a real lever on your per-token bill?</div>
+      <button class="q-opt">Batch / flex tiers — roughly −50% at Azure, Google, AWS and Anthropic</button>
+      <button class="q-opt">Prompt caching — a hit is ~10% of input price (2.5% on Anthropic's top model)</button>
+      <button class="q-opt">Switching from the API to the vendor's consumer chat subscription</button>
+      <button class="q-opt">Geo / regional processing premiums — about +10% at Azure Data Zone, Anthropic and Bedrock regional endpoints</button>
+      <div class="q-why">Consumer subscriptions (ChatGPT/Claude/Le Chat Pro) are a <em>seat</em> product with different terms, throughput and — critically — different data-training defaults. They are not a cheaper API route, and routing company data through them is usually the incident.</div>
+    </div>
+    <aside class="notes">Batch −50%: Anthropic Message Batches [AN-B], Azure batch SKUs [AZ-55], Google Batch/Flex [GO-P], Bedrock tiers [AWS-B]. Cache hit ~10%: [GO-P][AZ-56][ALI][KO-K3]; Anthropic top model $0.25 vs $10 input [AN-P]. Geo premium +10%: Azure Data Zone SKUs are exactly global×1.1 [AZ-55], Anthropic inference_geo [AN-P], Bedrock regional/multi-region [AN-P]. Mistral Pro $14.99/mo incl. $30 API credits is a seats product, not an API tier [MI-P].</aside>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="slide s-section" data-section="2 · Money">
+    <div class="num">2</div>
+    <h2>Money</h2>
+    <p class="sub">A price sheet, some arithmetic, and the date your finance model is already wrong about.</p>
+    <aside class="notes">Section 2 is the part CFOs trust: one table, one worked example, and the discount/premium mechanics that decide which vendor wins at your volume.</aside>
+  </section>
+
+  <!-- PRICE SHEET -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker amb">the price sheet</div>
+    <h2>Per 1M tokens, standard global tier, fetched 2026-09-04</h2>
+    <div class="content" style="margin-top:10px">
+      <table class="t sm">
+        <thead><tr><th>Model</th><th>$ in</th><th>$ out</th><th>cache hit</th><th>notes</th></tr></thead>
+        <tbody>
+          <tr><td>Claude Fable 5.1 <span class="dim">(also on Bedrock/Vertex/Foundry)</span></td><td>10</td><td>50</td><td>0.25</td><td>1M ctx at standard rates; Covered Model → 30-day retention, no ZDR [AN-P][AN-R]</td></tr>
+          <tr><td>Claude Opus 5</td><td>5</td><td>25</td><td>0.50</td><td>fast mode is premium-priced, first-party only</td></tr>
+          <tr><td>Claude Sonnet 5</td><td>2</td><td>10</td><td>0.20</td><td>the sane default of that family</td></tr>
+          <tr class="hl-best"><td>GPT-5.5 / 5.6-sol <span class="dim">(Azure)</span></td><td>5</td><td>30</td><td>0.50</td><td>batch 2.50/15 · PP priority <b>2.5×</b> = 12.50/75 · Data Zone 5.50/33 [AZ-55][AZ-56]</td></tr>
+          <tr><td>GPT-5.6-terra</td><td>2</td><td>12</td><td>0.20</td><td>the "good enough" rung of the same family</td></tr>
+          <tr><td>Gemini 3.8 Flash</td><td>0.75 → <b class="no">1.50</b></td><td>3.75 → <b class="no">7.50</b></td><td>0.075</td><td><b>the right-hand numbers are 2027-01-01</b>, published today [GO-P]</td></tr>
+          <tr><td>Kimi K3 <span class="dim">(Moonshot)</span></td><td>3.00</td><td>15</td><td>0.30</td><td>1,048,576-token context [KO-K3]</td></tr>
+          <tr><td>Kimi K2.5 · GLM-5 <span class="dim">(Bedrock)</span></td><td>0.60 · 1.00</td><td>3.00 · 3.20</td><td>—</td><td>flex ≈ half, priority ≈ +75% [AWS-B]</td></tr>
+          <tr class="hl-best"><td>Mistral Large</td><td>0.50</td><td>1.50</td><td>≈0.05</td><td>batch −50%; cached input up to −90% (vendor "up to") [MI-P]</td></tr>
+          <tr><td>Qwen3.8-max</td><td>2</td><td>6</td><td>0.20</td><td>cache write costs 125%; batch and cache never stack [ALI]</td></tr>
+          <tr><td>Sakana <b>Fugu Ultra</b></td><td>5</td><td>30</td><td>0.50</td><td>$10/$45 above 272K ctx; you pay the pool's top-tier rate, no fee stacking [SA-F]</td></tr>
+          <tr class="hl-best"><td>gpt-oss-120b · Nemotron 3 Super <span class="dim">(Bedrock)</span></td><td>0.15</td><td>0.60–0.65</td><td>—</td><td>the floor of every major cloud contract [AWS-B]</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <aside class="notes">Sources as tagged; the Azure figures are the Retail Prices API "Foundry Models" global SKUs, which is why they are exact rather than rounded. Two caveats to say out loud: (1) all of these are list, pre-EA/VCRC discount — negotiated pricing is not public and I did not invent any; (2) Anthropic's Claude 4.7+ tokenizer emits ~30% more tokens for identical text, so cross-generation comparisons must be re-tokenized, not compared per-token [AN-P].</aside>
+  </section>
+
+  <!-- WORKED MATH -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker">what a month costs</div>
+    <h2>100M in + 20M out per month: a 25× spread for "the same work"</h2>
+    <div class="cols c2" style="margin-top:18px">
+      <div>
+        <div class="bars">
+          <div class="bar m" style="--w:100%"><span>Claude Fable 5.1</span><div class="track"><div class="fill"></div></div><span class="val">$2,000</span></div>
+          <div class="bar a" style="--w:55%"><span>GPT-5.6-sol</span><div class="track"><div class="fill"></div></div><span class="val">$1,100</span></div>
+          <div class="bar" style="--w:50%"><span>Claude Opus 5</span><div class="track"><div class="fill"></div></div><span class="val">$1,000</span></div>
+          <div class="bar" style="--w:30%"><span>Kimi K3</span><div class="track"><div class="fill"></div></div><span class="val">$600</span></div>
+          <div class="bar" style="--w:22%"><span>Claude Sonnet 5</span><div class="track"><div class="fill"></div></div><span class="val">$400</span></div>
+          <div class="bar g" style="--w:16%"><span>Gemini 3.8 Flash</span><div class="track"><div class="fill"></div></div><span class="val">$150</span></div>
+          <div class="bar g" style="--w:11%"><span>Kimi K2.5 on Bedrock</span><div class="track"><div class="fill"></div></div><span class="val">$120</span></div>
+          <div class="bar g" style="--w:4%"><span>Mistral Large</span><div class="track"><div class="fill"></div></div><span class="val">$80</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="readout">
+          <div>cost = 100 × $in + 20 × $out</div>
+          <div style="margin-top:12px">flip the volume: <b>5M req/mo @ 800 in + 300 out</b></div>
+          <div>Fable 5.1 <b class="warn">$115,000</b> · Opus 5 <b>$57,500</b></div>
+          <div>Sonnet 5 <b>$23,000</b> · K3 <b>$34,500</b></div>
+          <div>Gemini 3.8F <b class="ok">$8,625</b> · GLM-5 <b class="ok">$8,800</b></div>
+          <div>Mistral Large <b class="ok">$4,250</b></div>
+          <div style="margin-top:12px;color:var(--txt-3)">same task mix, one order of magnitude apart</div>
+        </div>
+        <div class="callout amb" style="margin-top:14px">Nobody pays one price. The real architecture is a <b>cascade</b>: cheap model answers, escalates on confidence — and the escalation budget is a policy, not a surprise.</div>
+      </div>
+    </div>
+    <aside class="notes">Arithmetic from the note's §3 worked math, using the list prices on the previous slide. Say clearly: this is token math only — no gateway fee, no guardrail scan, no egress, no eval cost, no human review. Those are the next slide's arguments for why "cheapest model" and "cheapest system" differ.</aside>
+  </section>
+
+  <!-- DISCOUNT ARITHMETIC -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker grn">discount &amp; premium arithmetic</div>
+    <h2>Every lever is a multiplier — and half of them don't stack</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div>
+        <table class="t sm">
+          <thead><tr><th>Lever</th><th>Effect</th><th>Gotcha</th></tr></thead>
+          <tbody>
+            <tr><td><b>Batch / Flex</b></td><td class="ok">≈ −50%</td><td>async, no SLA; stacks with nothing at Alibaba</td></tr>
+            <tr><td><b>Prompt cache hit</b></td><td class="ok">≈ −90% of input</td><td>Anthropic top model 2.5%; write costs 1.25×/2× (5m/1h); Qwen write 125%</td></tr>
+            <tr><td><b>Priority</b></td><td class="no">+75–80%</td><td>Azure PP up to 2.5× — 2.5× for the same model is a lot of headroom</td></tr>
+            <tr><td><b>Geo / Data Zone</b></td><td class="no">+10%</td><td>Azure DZ SKUs are exactly global × 1.1; buy it where the regulator needs it</td></tr>
+            <tr><td><b>Long context</b></td><td class="no">+100%</td><td>GPT-5.6-sol $10/$45 and Fugu $10/$45 above their context breakpoint</td></tr>
+            <tr><td><b>Tokenizer drift</b></td><td class="no">+30% tokens</td><td>Claude 4.7+ emits ~30% more tokens for identical text — re-measure, don't re-price</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="readout">
+          <div>cache is the biggest lever you control:</div>
+          <div style="margin-top:8px">100M input on Opus 5 = <b>$500</b></div>
+          <div>with 70% cache hit = 30×5 + 70×0.5 = <b class="ok">$185</b></div>
+          <div style="margin-top:8px;color:var(--txt-3)">= −63% for prompt hygiene, not for vendor love</div>
+        </div>
+        <div class="card accent-g" style="margin-top:14px"><h3>Sequence, don't collect</h3>
+          <ul class="b compact">
+            <li>Structure prompts so the stable prefix caches first</li>
+            <li>Move anything latency-insensitive to batch — that is a free 50%</li>
+            <li>Buy priority only where a human is waiting</li>
+            <li>Pay for Data Zone only where a regulator is</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Cache hit prices: Google $0.075 vs $0.75 [GO-P]; Azure cached $0.50 vs $5 [AZ-55]; Anthropic Fable 5.1 $0.25 vs $10, writes 1.25×/2× [AN-P]; Qwen write 125% / hit 10%, batch+cache never stack [ALI]; Azure PP = 2.5× and DZ = ×1.1 from the retail API rows [AZ-55]. The $185 figure: 30M uncached × $5 + 70M cached × $0.50 = 150 + 35.</aside>
+  </section>
+
+  <!-- THE DATE -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker mag">the date your model is wrong about</div>
+    <h2>Prices move on a calendar, and access moves overnight</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div>
+        <div class="bars">
+          <div class="bar g" style="--w:20%"><span>Gemini 3.8 Flash today</span><div class="track"><div class="fill"></div></div><span class="val">$0.75</span></div>
+          <div class="bar m" style="--w:40%"><span>…2027-01-01 (published)</span><div class="track"><div class="fill"></div></div><span class="val">$1.50</span></div>
+          <div class="bar a" style="--w:27%"><span>GPT-5.5 today</span><div class="track"><div class="fill"></div></div><span class="val">$5.00</span></div>
+          <div class="bar m" style="--w:45%"><span>…your volume × 3 in 2027</span><div class="track"><div class="fill"></div></div><span class="val">$15.0M</span></div>
+        </div>
+        <div class="callout mag" style="margin-top:18px">Google publishes a <b>dated</b> doubling. At your 2027 volume that is a six-figure line item nobody booked. Put a price-lock or repricing-notice clause in the renewal <b>before</b> the date, not after.</div>
+      </div>
+      <div>
+        <div class="card accent-m"><div class="ico">⛓</div><h3>And access can just stop</h3>
+          <ul class="b compact">
+            <li>Sakana's own launch pitch: US export controls on Anthropic's Fable/Mythos mean "access can shift… overnight" — it is selling <b>routing around that risk</b> [SA-FR]</li>
+            <li>Those same "Covered Models" require 30-day retention with <b>no zero-data-retention option</b> [AN-R] — a compliance pin, not a preference</li>
+            <li>Anthropic deprecations: Active → Legacy → Deprecated → Retired, with email notice; <b>Bedrock/Vertex keep their own clocks</b> [AN-D]</li>
+            <li>Azure sells aliases like <code class="tok">gpt-chat-latest</code> — an alias is a model swap you did not approve [AZ-M]</li>
+          </ul>
+        </div>
+        <p class="mut" style="font-size:13px;margin-top:10px">The export-control claim is vendor-asserted plus the retention carve-out; I did not fetch a government document, so quote it as Sakana's framing.</p>
+      </div>
+    </div>
+    <aside class="notes">[GO-P] ai.google.dev pricing page states the 3.8 Flash schedule explicitly. [SA-FR] sakana.ai/fugu-release. [AN-R] Anthropic data-retention doc: Fable 5/5.1 and Mythos are "Covered Models" — 30-day retention, ZDR unavailable. [AN-D] model deprecations doc. Be honest in the room: the bars on the left are the published schedule plus a volume assumption I stated, not a forecast.</aside>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="slide s-section" data-section="3 · Gateways">
+    <div class="num">3</div>
+    <h2>Gateways</h2>
+    <p class="sub">Two very different answers to "one API, many models" — and the thing neither one transfers.</p>
+    <aside class="notes">Section 3: what a gateway buys, OpenRouter as the marketplace, Fugu as the orchestrator, then the closing quiz of the section.</aside>
+  </section>
+
+  <!-- WHAT A GATEWAY BUYS -->
+  <section class="slide" data-time="2">
+    <div class="kicker">what a gateway buys you</div>
+    <h2>A gateway is your exit strategy with a uptime SLA attached</h2>
+    <div class="flow" style="margin-top:20px;justify-content:center">
+      <div class="fnode c">your apps<small>one endpoint</small></div>
+      <div class="farr">→<small>keys</small></div>
+      <div class="fnode v">GATEWAY<small>route · retry · budget · log</small></div>
+      <div class="farr">→</div>
+      <div class="fnode">Azure<small>PTU</small></div>
+      <div class="fnode">Bedrock<small>+Kimi/GLM/Qwen</small></div>
+      <div class="fnode">Vertex<small>Flex/Priority</small></div>
+      <div class="fnode g">open weights<small>NIM · vLLM</small></div>
+    </div>
+    <div class="cols c2" style="margin-top:24px">
+      <div class="card accent-g"><h3>Buys</h3>
+        <ul class="b compact">
+          <li>one contract → many models; <b>fallback lists</b> and retry across providers</li>
+          <li>routing by price / latency / throughput percentile + A-B</li>
+          <li>budgets, cost analytics, key custody, audit log</li>
+          <li>a place to pin <code class="tok">alias → model@version</code> so nothing swaps silently</li>
+        </ul>
+      </div>
+      <div class="card accent-m"><h3>Never buys</h3>
+          <ul class="b compact">
+          <li><b>Compliance does not transfer.</b> Retention and geo terms come from the model vendor underneath</li>
+          <li>fees: OpenRouter 5.5% on credits ($0.80 min), 5% BYOK; Portkey Free 10k logs → Pro $49/mo → $9/100k requests</li>
+          <li>a self-hosted gateway adds ops + a hop of latency</li>
+          <li>quality: routing cannot make a weaker model answer your hardest 5%</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">[OR-F][OR-B] OpenRouter fees; [PK] Portkey pricing (Free 10k logs/3-day retention, Pro $49/mo, Enterprise $9 per 100k requests up to 3M); [LL] LiteLLM self-hosted "100+ LLMs in OpenAI format"; [CF] Cloudflare AI Gateway caching/analytics/logging/rate-limit/retry+fallback; [APIM] Azure APIM speaks OpenAI Chat Completions, Responses and Anthropic Messages schemas; [KONG] pricing page 404'd — quote via sales. Deck 06 covers the security half of the same box.</aside>
+  </section>
+
+  <!-- OPENROUTER -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker">the marketplace answer</div>
+    <h2>OpenRouter: procurement speed for 5.5%</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div>
+        <table class="t sm">
+          <thead><tr><th>Dimension</th><th>OpenRouter, measured 2026-09-04</th></tr></thead>
+          <tbody>
+            <tr><td>Catalogue</td><td><b>427 models</b> in one API, incl. <code class="tok">:free</code> (50 req/day, 1,000 with credits) and <code class="tok">:batch</code> variants at −50%</td></tr>
+            <tr><td>Fee</td><td><b>5.5%</b> on credit purchases ($0.80 min; 5% crypto) · <b>5% BYOK</b> on your own keys</td></tr>
+            <tr><td>Routing</td><td><code class="tok">sort</code> by price / latency / throughput percentile, provider uptime optimisation, prompt-cache-aware routing, <b>fallbacks list</b></td></tr>
+            <tr><td>Contract</td><td>none per vendor. One invoice, no procurement cycle</td></tr>
+            <tr><td>Compliance</td><td>whatever the underlying provider's terms say — verify per model, per region</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="card accent-c"><h3>When it wins</h3>
+          <ul class="b compact">
+            <li>Experimentation: try 30 models this week, no legal review each</li>
+            <li>Bursty or low volume: 5.5% of a small bill &lt; your procurement salary</li>
+            <li>Fallback plumbing you'd otherwise write badly</li>
+          </ul>
+        </div>
+        <div class="card accent-m" style="margin-top:14px"><h3>When it loses</h3>
+          <ul class="b compact">
+            <li>Scale: 5.5% on a $120k/mo bill is <b>$6.6k/mo</b> for a routing layer</li>
+            <li>Regulated data: you now have a fourth party in the path and no negotiated DPA with the model vendor</li>
+            <li>You already have EA/VCRC discounts a list-price router won't pass through</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">[OR-M] model count = live count of /api/v1/models on 2026-09-04 — a snapshot, say so. [OR-F] fees, free-model rate limits. [OR-B] BYOK 5%. [OR-R] routing/modes doc. Batch example on the note: gemini-3.8-flash $0.75/$3.75 → $0.375/$1.875. The honest framing: OpenRouter is a procurement-time arbitrage, not a cost arbitrage — at enterprise volume the fee usually exceeds the savings.</aside>
+  </section>
+
+  <!-- FUGU -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker vio">the Japanese answer</div>
+    <h2>Fugu is not a router — it is an orchestrator pretending to be one model</h2>
+    <div class="cols c21" style="margin-top:14px">
+      <div>
+        <table class="t sm">
+          <thead><tr><th></th><th>OpenRouter</th><th>Sakana Fugu</th></tr></thead>
+          <tbody>
+            <tr><td>What it is</td><td>a marketplace of 427 models</td><td><b>one model ID</b> (Chat Completions + Responses) whose internals route across a swappable pool of frontier models</td></tr>
+            <tr><td>You choose</td><td>the model, or a sort order</td><td>nothing — "one model to command them all"</td></tr>
+            <tr><td>Price</td><td>provider price + 5.5%</td><td><b>$5 in / $30 out / $0.50 cached</b>; $10/$45 above 272K ctx; subs $20/$100/$200/mo [SA-F]</td></tr>
+            <tr><td>Research base</td><td>routing heuristics</td><td>TRINITY + Conductor (ICLR 2026); tech report <b>arXiv:2606.21228</b></td></tr>
+            <tr><td>Enterprise pitch</td><td>speed, breadth</td><td>agent <b>opt-out</b> for privacy/compliance; hedge against export-control risk [SA-FR]</td></tr>
+            <tr><td>Gap</td><td>fourth party in the path</td><td><b>not available in EU/EEA</b> pending GDPR work [SA-F]</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="card accent-v"><div class="ico">🇯🇵</div><h3>Why a European should care</h3>
+          <ul class="b compact">
+            <li>It prices <b>sovereignty of access</b> as a product feature</li>
+            <li>"No fee stacking" is a real pricing claim: you pay the pool's top-tier rate, once</li>
+            <li>But you inherit the <b>pool's</b> compliance posture, and the pool is swappable by the vendor</li>
+            <li>Benchmarks are vendor-published "shoulder-to-shoulder with Fable 5 / Mythos Preview" — treat as a claim</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">[SA-F] sakana.ai/fugu (pricing, tiers, availability, "one model to command them all", research lineage), [SA-FR] release post (export-control framing, opt-out, benchmark claims), [SA-RM] SakanaAI/fugu README. Correct the ABEJA conflation if it comes up: no source resolves "Fugu" to ABEJA's older Fugu family [HN-S]. If asked "does orchestration actually help?": Sakana publishes a router/orchestrator evaluation where multi-model routing lifts accuracy materially, but I did not reproduce it — say "vendor-reported".</aside>
+  </section>
+
+  <!-- QUIZ 2 -->
+  <section class="slide" data-time="0.5">
+    <div class="quiz" data-answer="b" data-qid="q-p2">
+      <div class="q">You move from a direct Anthropic contract to OpenRouter for convenience. What did <em>not</em> change?</div>
+      <button class="q-opt">Your per-token price</button>
+      <button class="q-opt">The retention and data-training terms of the model that answers</button>
+      <button class="q-opt">The number of parties in the request path</button>
+      <button class="q-opt">Your ability to switch models</button>
+      <div class="q-why">A gateway adds a party and changes pricing; it does <b>not</b> change the model vendor's retention or training terms — those follow the model underneath. If your DPA says "no retention", you must verify the terms of the actual provider that served each request.</div>
+    </div>
+    <aside class="notes">[AN-R] retention regimes including Covered Models; [GO-P] paid tier "not used to improve products" vs free tier; [OR-F] fee structure. This is the most common misunderstanding about routers in enterprise conversations.</aside>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="slide s-section" data-section="4 · Choosing">
+    <div class="num">4</div>
+    <h2>Choosing</h2>
+    <p class="sub">A procurement grid, then a simulator so you can argue with it live.</p>
+    <aside class="notes">Section 4: the "if you are X, pick Y" grid, then the widget. Keep the grid short — it's the hook, the widget is the argument.</aside>
+  </section>
+
+  <!-- PROCUREMENT GRID -->
+  <section class="slide" data-time="2">
+    <div class="kicker grn">if you are X, pick Y</div>
+    <h2>There is no best vendor. There is a best partner for your estate</h2>
+    <div class="content" style="margin-top:12px">
+      <table class="t sm">
+        <thead><tr><th>You are</th><th>Partner</th><th>Why</th><th>Watch</th></tr></thead>
+        <tbody>
+          <tr><td><b>Microsoft estate</b></td><td>Foundry (+ Claude CCUs in the same invoice)</td><td>EA discount, PTU capacity, SLA-billed, GPT-6 preview; Claude at $0.01/CCU ×100 [AZ-M][AN-P]</td><td>alias drift; PP at 2.5×; DZ +10%</td></tr>
+          <tr><td><b>AWS shop</b></td><td>Bedrock</td><td>IAM/VPC you already trust, tiers, and Kimi/GLM/Qwen/gpt-oss <b>in contract</b> [AWS-B]</td><td>model quality ≠ the vendor's own API surface</td></tr>
+          <tr><td><b>GCP</b></td><td>Vertex + Gemini</td><td>cheapest capable tier today, Flex/Priority/Batch, caching [GO-P]</td><td>the 2027 repricing clause, in writing</td></tr>
+          <tr class="hl-best"><td><b>EU-regulated</b></td><td>Mistral <i>or</i> Azure Data Zone</td><td>ZDR offering, EU infra, dedicated/VPC/on-prem, <b>$0.50/$1.50</b> [MI-P][MI-M]</td><td>"up to −90%" cache claim; smaller frontier ceiling</td></tr>
+          <tr><td><b>Quality-first, low lock-in</b></td><td>Claude + GPT through your own gateway</td><td>pinned versions, eval on both, real failover [AN-P][AZ-55]</td><td>you own the eval suite now — forever</td></tr>
+          <tr><td><b>Cost-driven scale</b></td><td>Gemini 3.8F / K2.5 / GLM-5 + batch + 70% cache</td><td>Scenario A: <b>$80–164 vs $2,000</b> for the same volume [GO-P][AWS-B]</td><td>quality gap on your hard 5%; measure it</td></tr>
+          <tr><td><b>Export-control hedge / JP</b></td><td>Sakana Fugu + an open-weight fallback</td><td>access-risk framing, OpenAI-compatible, no fee stacking [SA-F]</td><td>no EU/EEA availability today</td></tr>
+          <tr><td><b>Run it yourself</b></td><td>NIM + Dynamo / vLLM on your GPUs</td><td>sovereignty, no per-token bill, 50× MoE claim vs Hopper [NV-D]</td><td>GPU TCO must beat the $/1M math — usually only at volume</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <aside class="notes">Every cell traces to §1–3 of the note. The two cells worth lingering on: EU-regulated (Mistral is the only one of these offering ZDR + EU infra + open weights + a $0.50 frontier-adjacent price) and cost-driven scale (where the gateway decision from deck 06 lets you actually run a cascade). Say the uncomfortable one out loud: the "run it yourself" row is a finance decision, not an engineering one — I could not verify NVIDIA DGX Cloud $/GPU·hr, so build your own TCO.</aside>
+  </section>
+
+  <!-- WIDGET: PARTNER SIM -->
+  <section class="slide" data-time="2">
+    <div class="kicker mag">live demo · partner &amp; rollback simulator</div>
+    <h2>Set your priorities, then break the world</h2>
+    <div data-widget="partner-sim" style="margin-top:10px">
+      <noscript><p class="dim">Demo needs JavaScript.</p></noscript>
+    </div>
+    <aside class="notes">Flow: (1) pick an org profile — scores and cost change; (2) move the four priority sliders and watch the ranking flip: that is the whole argument that "best vendor" is a function of your constraints; (3) then click the failure buttons — <b>outage</b>, <b>+100% price on 2027-01-01</b>, <b>export-control freeze</b> — and read the "what still works / how long to leave" column. Cost line uses the list prices from the price slide at the chosen volume; scores are my qualitative matrix (0–5) applied to those prices, not a vendor benchmark — say that. Numbers per candidate are in the note file §1–5.</aside>
+  </section>
+
+  <!-- POLL -->
+  <section class="slide" data-time="0.5">
+    <div class="poll" data-pid="p-partner">
+      <h3>Who signs your AI contract today?</h3>
+      <div class="p-opt"><div class="p-head"><span>One hyperscaler, one model family</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>Two clouds, no abstraction</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>Gateway / router over several</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="p-opt"><div class="p-head"><span>Mostly open weights, self-hosted</span><span class="pc"></span></div><div class="p-track"><div class="p-fill"></div></div></div>
+      <div class="hint">Tap a bar — local to this page, nothing is sent anywhere.</div>
+    </div>
+    <aside class="notes">Use the result to pick which rollback story to tell in section 5: single-vendor rooms need the outage story; gateway rooms need the silent-quality-regression story.</aside>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="slide s-section" data-section="5 · Leaving">
+    <div class="num">5</div>
+    <h2>Leaving</h2>
+    <p class="sub">The contract you should sign is the one you can walk out of in a fortnight.</p>
+    <aside class="notes">Section 5: the lock-in inventory, the rollback playbook, the last quiz, the recap. This is the part that makes the talk memorable — everyone can pick a vendor, nobody rehearses leaving one.</aside>
+  </section>
+
+  <!-- LOCK-IN INVENTORY -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker mag">the lock-in inventory</div>
+    <h2>What actually pins you is never the API shape</h2>
+    <div class="cols c2" style="margin-top:16px">
+      <div class="card accent-m"><h3>Pins (ranked by how much they hurt)</h3>
+        <ul class="b compact">
+          <li><b>Embeddings</b> — different dimensions ⇒ re-embed the whole corpus</li>
+          <li><b>Fine-tuned weights</b> that never leave the vendor's platform</li>
+          <li><b>Committed capacity</b> — Azure PTU $312/PTU/mo, AWS/GCP commit SKUs</li>
+          <li><b>Retention regimes</b> — Fable/Mythos Covered Models: 30-day retention, no ZDR [AN-R]</li>
+          <li><b>Prompt/eval suites</b> tuned to one vendor's quirks &amp; tool dialects</li>
+          <li><b>Tokener drift</b> — 4.7+ ≈ +30% tokens for identical text [AN-P]</li>
+        </ul>
+      </div>
+      <div class="card accent-g"><h3>Portable (make these the majority)</h3>
+        <ul class="b compact">
+          <li>OpenAI-compatible endpoints — Azure APIM speaks Chat/Responses <b>and</b> Anthropic Messages [APIM]; Kimi, Sakana, Mistral all expose them</li>
+          <li>Open weights: Mistral Large 3 (Apache-2.0), gpt-oss, Qwen, GLM → NIM / Dynamo / vLLM</li>
+          <li>Your own eval harness, golden sets and red-team suite — vendor-neutral by construction</li>
+          <li>Batch artifacts, cached prompts, and the tool schemas you wrote</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:16px">Rule of thumb: if switching costs more than <b>two quarters</b> of the bill differential, you don't have a vendor — you have a dependency. Price that dependency at the start of the negotiation, not at the renewal.</div>
+    <aside class="notes">[AZ-PTU] $312/PTU/month from the Azure retail API rows; [AN-P][AN-R] tokenizer note and Covered-Models retention; [APIM] Azure API Management GenAI capabilities. The embeddings point is arithmetic, not opinion: a 1536-dim index cannot be queried by a 3072-dim vector; re-embedding a corpus of millions of chunks is a real project with GPU cost.</aside>
+  </section>
+
+  <!-- ROLLBACK PLAYBOOK -->
+  <section class="slide" data-time="1.5">
+    <div class="kicker amb">rollback playbook</div>
+    <h2>Six ways the ground moves — and what you do in the first 48 hours</h2>
+    <div class="content" style="margin-top:12px">
+      <table class="t sm">
+        <thead><tr><th>Event</th><th>Reality (2025–26)</th><th>First 48 h</th><th>Pre-built</th></tr></thead>
+        <tbody>
+          <tr><td><b>Provider outage</b></td><td>any single endpoint fails</td><td>gateway fallback list fires; confirm the fallback's quality on your eval set, not theirs</td><td>dual-homed contracts + pinned aliases</td></tr>
+          <tr><td><b>Price hike</b></td><td>Gemini 3.8F doubles <b>on a published date</b> [GO-P]</td><td>shift volume to the second source; re-open commit; check whether cache/batch closes the gap</td><td>price-lock clause + second source approved <i>before</i> renewal</td></tr>
+          <tr><td><b>Deprecation</b></td><td>dated retirements; clouds keep their own clocks [AN-D]</td><td>pin to the retiring ID, run eval on successor, schedule the swap</td><td>version pinning + deprecation calendar</td></tr>
+          <tr><td><b>Silent quality regression</b></td><td>aliases update under you (<code class="tok">gpt-chat-latest</code>) [AZ-M]</td><td>freeze traffic mix, diff against the golden set, roll back the alias</td><td>nightly dual-vendor eval, previous version kept warm</td></tr>
+          <tr><td><b>Security incident</b></td><td>leaked keys, retained data, plugins</td><td>revoke at the gateway, rotate per-vendor keys, pull the audit log</td><td>ZDR where eligible [AN-R]; least-privilege keys (deck 06)</td></tr>
+          <tr class="hl-warn"><td><b>Export control / acquisition</b></td><td>"access can shift overnight" [SA-FR]; Covered-Models retention [AN-R]</td><td>flip to the open-weight path (Mistral/GLM/Qwen on Bedrock or NIM); notify legal</td><td>approved open-weight fallback + substitution clause</td></tr>
+        </tbody>
+      </table>
+      <div class="cols c3" style="margin-top:16px">
+        <div class="card"><h3>Clause list to hand your legal team</h3><p class="mut" style="font-size:14px">price-change notice period · substitution &amp; force-majeure terms · model-version notice (≥90 days) · retention/ZDR per model · audit &amp; log export rights · exit assistance &amp; data return format</p></div>
+        <div class="card"><h3>Technical insurance</h3><p class="mut" style="font-size:14px">pinned <code class="tok">model@version</code> behind your own aliases · gateway fallback tested quarterly · golden eval set in your repo, not the vendor's console · embeddings re-buildable</p></div>
+        <div class="card"><h3>The drill</h3><p class="mut" style="font-size:14px">twice a year: cut 20% of production traffic to the second source for a day, run the eval, write down what broke. A rollback you have not rehearsed is a rumour.</p></div>
+      </div>
+    </div>
+    <aside class="notes">Sources as tagged in the table. The "first 48 hours" column is operational advice, not a citation — it comes from the pattern of what actually fails: fallbacks that were never quality-tested, aliases nobody pinned, eval dashboards that live in the vendor's console and leave with the contract. If you remember one line: <b>the second source must be approved before the renewal, not after the shock.</b></aside>
+  </section>
+
+  <!-- QUIZ 3 -->
+  <section class="slide" data-time="1">
+    <div class="quiz" data-answer="a" data-qid="q-p3">
+      <div class="q">Your vendor announces a 40% price rise effective in 60 days on a model serving 70% of your traffic. What is the <em>first</em> move?</div>
+      <button class="q-opt">Move the approved second source onto traffic — the one you qualified last quarter</button>
+      <button class="q-opt">Start evaluating three new vendors this week</button>
+      <button class="q-opt">Accept, but negotiate a bigger commit discount</button>
+      <button class="q-opt">Re-write prompts to use fewer tokens</button>
+      <div class="q-why">In 60 days you cannot qualify a vendor: legal, security, eval and integration each take longer than that. The only fast lever is the source you <b>already approved</b> — which is exactly why the second source is a standing capability, not a project triggered by bad news.</div>
+    </div>
+    <aside class="notes">This is the point of the whole fifth section. If the audience takes one action home: qualify a second source now, cheaply, at 1% of traffic, and keep it warm with a nightly eval.</aside>
+  </section>
+
+  <!-- RECAP -->
+  <section class="slide" data-time="1">
+    <div class="kicker grn">recap</div>
+    <h2>Five things to remember</h2>
+    <div class="content" style="margin-top:12px">
+      <ul class="b">
+        <li><b>The unit of procurement is a platform contract</b>, not a model: processing region, retention, throughput reservation, exit cost.</li>
+        <li><b>The spread is 33× inside one cloud</b> — $0.15 to $5 per 1M input on Bedrock/Foundry alone. Cascade routing is where that money lives.</li>
+        <li><b>Discounts are arithmetic, premiums are policy</b>: batch ≈−50%, cache hit ≈−90% of input, priority +75–80% (Azure PP 2.5×), geo +10%, and they often don't stack.</li>
+        <li><b>Gateways buy speed and failover; they never transfer compliance.</b> OpenRouter = marketplace for 5.5%; Fugu = orchestrator selling access sovereignty (and not in the EU/EEA yet).</li>
+        <li><b>Qualify the second source before the renewal</b>, pin <code class="tok">model@version</code> behind your own aliases, keep the eval set in your repo, and rehearse the rollback twice a year.</li>
+      </ul>
+      <div class="chiprow" style="margin-top:18px"><span class="chip">quiz score: <b data-score>–</b></span><span class="chip a">list prices 2026-09-04</span><span class="chip c">OpenRouter</span><span class="chip v">Sakana Fugu</span><span class="chip g">Mistral ZDR</span><span class="chip m">rollback</span></div>
+    </div>
+    <aside class="notes">Full citations, the claim-audit table and the could-not-verify list (Vertex PTU $/unit, Bedrock Guardrails/AgentCore unit prices, Kong pricing, Moonshot &amp; Z.ai certifications, GPT-6 context &amp; GA price, NVIDIA DGX Cloud rates) are in research/notes/vendor-gateway-partnership.md. Next: deck 08 — generative video &amp; images on hardware you already own.</aside>
+  </section>
+
+</div>
+<script>
+/* ---- partner & rollback simulator ---- */
+window.DeckWidgets = window.DeckWidgets || {};
+window.DeckWidgets["partner-sim"] = function (el) {
+  /* Scoring matrix is MY qualitative read of the vendors (0–5 per dimension),
+     combined with list prices fetched 2026-09-04. Cited numbers are in the notes;
+     the scores are a judgement aid, not a benchmark. */
+  var CAND = [
+    { id: "foundry", name: "Azure Foundry", in1m: 1.25, out1m: 10, blend: 2.5,
+      s: { price: 3, quality: 5, comp: 5, exit: 3 }, shock: { outage: 3, hike: 2, ctrl: 3 },
+      days: 45, note: "PTU capacity + GPT-6 preview + Claude CCUs on one invoice" },
+    { id: "bedrock", name: "AWS Bedrock", in1m: 0.60, out1m: 3.00, blend: 1.08,
+      s: { price: 4, quality: 4, comp: 5, exit: 4 }, shock: { outage: 4, hike: 4, ctrl: 5 },
+      days: 30, note: "Kimi K2.5 / GLM-5 / Qwen / gpt-oss behind your IAM" },
+    { id: "vertex", name: "Vertex / Gemini", in1m: 0.75, out1m: 3.75, blend: 1.35,
+      s: { price: 5, quality: 4, comp: 4, exit: 3 }, shock: { outage: 3, hike: 1, ctrl: 3 },
+      days: 40, note: "cheapest capable tier today — doubles 2027-01-01" },
+    { id: "anthropic", name: "Anthropic direct", in1m: 2, out1m: 10, blend: 3.6,
+      s: { price: 3, quality: 5, comp: 4, exit: 3 }, shock: { outage: 3, hike: 3, ctrl: 2 },
+      days: 50, note: "top quality; Covered Models = 30-day retention, no ZDR" },
+    { id: "mistral", name: "Mistral", in1m: 0.50, out1m: 1.50, blend: 0.70,
+      s: { price: 5, quality: 3, comp: 5, exit: 5 }, shock: { outage: 4, hike: 5, ctrl: 5 },
+      days: 20, note: "EU infra, ZDR offering, Apache-2.0 weights as the exit" },
+    { id: "or", name: "OpenRouter", in1m: 0.60, out1m: 3.00, blend: 1.13,
+      s: { price: 4, quality: 5, comp: 2, exit: 5 }, shock: { outage: 5, hike: 5, ctrl: 2 },
+      days: 14, note: "427 models, no contracts, +5.5% — compliance stays the provider's" },
+    { id: "fugu", name: "Sakana Fugu", in1m: 5, out1m: 30, blend: 10.0,
+      s: { price: 2, quality: 4, comp: 3, exit: 2 }, shock: { outage: 4, hike: 3, ctrl: 5 },
+      days: 60, note: "orchestrator over a swappable pool; not in EU/EEA yet" },
+    { id: "self", name: "Self-hosted open weights", in1m: 0.35, out1m: 1.20, blend: 0.52,
+      s: { price: 5, quality: 3, comp: 5, exit: 5 }, shock: { outage: 2, hike: 5, ctrl: 5 },
+      days: 90, note: "your GPU bill, your on-call; NIM / Dynamo / vLLM" }
+  ];
+  var PROFILES = [
+    { id: "ms", label: "Microsoft estate", w: { price: 2, quality: 5, comp: 4, exit: 2 }, boost: ["foundry", "anthropic"] },
+    { id: "aws", label: "AWS shop", w: { price: 3, quality: 4, comp: 5, exit: 3 }, boost: ["bedrock"] },
+    { id: "eu", label: "EU-regulated", w: { price: 3, quality: 3, comp: 5, exit: 4 }, boost: ["mistral"] },
+    { id: "cost", label: "Cost-driven scale", w: { price: 5, quality: 3, comp: 2, exit: 4 }, boost: ["vertex", "self"] },
+    { id: "fast", label: "Fast experimentation", w: { price: 3, quality: 4, comp: 1, exit: 5 }, boost: ["or"] },
+    { id: "sov", label: "Sovereignty / export-risk", w: { price: 2, quality: 4, comp: 5, exit: 5 }, boost: ["fugu", "self"] }
+  ];
+  var SHOCKS = [
+    { id: "none", label: "steady state", mult: 1, key: null, msg: "no event — ranking is pure preference" },
+    { id: "outage", label: "primary region outage", mult: 1, key: "outage", msg: "one endpoint is down: who can you actually fail over to?" },
+    { id: "hike", label: "2027-01-01 repricing (+100%)", mult: 1, key: "hike", msg: "the published Google doubling lands; committed vendors re-price too" },
+    { id: "ctrl", label: "export-control freeze", mult: 1, key: "ctrl", msg: "access to US frontier models shifts overnight (Sakana's framing)" }
+  ];
+  var st = { prof: "eu", w: { price: 3, quality: 4, comp: 5, exit: 3 }, vol: 120, shock: "none" };
+
+  el.innerHTML =
+    '<div class="calc">' +
+      '<div>' +
+        '<div class="ctrl"><label style="display:block;font:600 13px var(--font-mono);color:var(--txt-2);margin-bottom:4px">organisation profile</label><select class="sel" id="ps-prof"></select></div>' +
+        '<div class="ctrl"><label>price sensitivity <output id="ps-o-p"></output></label><input type="range" id="ps-p" min="1" max="5" step="1" value="3"></div>' +
+        '<div class="ctrl"><label>quality requirement <output id="ps-o-q"></output></label><input type="range" id="ps-q" min="1" max="5" step="1" value="4"></div>' +
+        '<div class="ctrl"><label>compliance requirement <output id="ps-o-c"></output></label><input type="range" id="ps-c" min="1" max="5" step="1" value="5"></div>' +
+        '<div class="ctrl"><label>exit / portability need <output id="ps-o-e"></output></label><input type="range" id="ps-e" min="1" max="5" step="1" value="3"></div>' +
+        '<div class="ctrl"><label>monthly volume (M tokens, in+out) <output id="ps-o-v"></output></label><input type="range" id="ps-v" min="10" max="1000" step="10" value="120"></div>' +
+        '<div style="margin-top:6px">' + SHOCKS.map(function (s, i) {
+          return '<button class="btn ghost ps-shock' + (i === 0 ? ' g' : '') + '" data-shock="' + s.id + '" style="margin:0 6px 6px 0">' + s.label + '</button>';
+        }).join("") + '</div>' +
+      '</div>' +
+      '<div>' +
+        '<div id="ps-rank"></div>' +
+        '<div class="readout" id="ps-out" style="margin-top:12px"></div>' +
+      '</div>' +
+    '</div>';
+
+  var $ = function (id) { return el.querySelector("#" + id); };
+  var profSel = $("ps-prof");
+  PROFILES.forEach(function (p) {
+    var o = document.createElement("option"); o.value = p.id; o.textContent = p.label;
+    if (p.id === st.prof) o.selected = true; profSel.appendChild(o);
+  });
+
+  function applyProfile(p) {
+    $("ps-p").value = p.w.price; $("ps-q").value = p.w.quality;
+    $("ps-c").value = p.w.comp; $("ps-e").value = p.w.exit;
+    st.w = { price: p.w.price, quality: p.w.quality, comp: p.w.comp, exit: p.w.exit };
+  }
+
+  function score(c) {
+    var p = PROFILES.filter(function (x) { return x.id === st.prof; })[0];
+    var wsum = st.w.price + st.w.quality + st.w.comp + st.w.exit;
+    var raw = (c.s.price * st.w.price + c.s.quality * st.w.quality + c.s.comp * st.w.comp + c.s.exit * st.w.exit) / (5 * wsum);
+    var s = raw * 100;
+    if (p.boost.indexOf(c.id) >= 0) s += 4;                 // estate gravity
+    var sh = SHOCKS.filter(function (x) { return x.id === st.shock; })[0];
+    if (sh.key) s = s * 0.72 + (c.shock[sh.key] / 5) * 28;   // resilience becomes 28% of the score
+    return Math.round(Math.max(2, Math.min(99, s)));
+  }
+
+  function render() {
+    ["price", "quality", "comp", "exit"].forEach(function (k) {
+      var map = { price: "ps-o-p", quality: "ps-o-q", comp: "ps-o-c", exit: "ps-o-e" };
+      $(map[k]).textContent = st.w[k] + "/5";
+    });
+    $("ps-o-v").textContent = (+st.vol).toLocaleString() + "M";
+
+    var sh = SHOCKS.filter(function (x) { return x.id === st.shock; })[0];
+    var hikeHit = sh.id === "hike";
+    var ranked = CAND.map(function (c) {
+      var blend = c.blend * (hikeHit && c.id === "vertex" ? 2 : 1) * (hikeHit && c.id === "or" ? 1.9 : 1);
+      return { c: c, sc: score(c), blend: blend, cost: blend * (+st.vol) };
+    }).sort(function (a, b) { return b.sc - a.sc; });
+
+    $("ps-rank").innerHTML = ranked.slice(0, 5).map(function (r, i) {
+      var cls = i === 0 ? "g" : r.sc < 45 ? "m" : "";
+      return '<div class="bar ' + cls + '" style="--w:' + r.sc + '%">' +
+        '<span>' + (i + 1) + '. ' + r.c.name + '</span>' +
+        '<div class="track"><div class="fill"></div></div>' +
+        '<span class="val">$' + Math.round(r.cost).toLocaleString() + '</span></div>';
+    }).join("");
+
+    var top = ranked[0], alt = ranked[1];
+    $("ps-out").innerHTML =
+      '<div>' + sh.msg + '</div>' +
+      '<div style="margin-top:8px">pick <b>' + top.c.name + '</b> · <span class="ok">$' + Math.round(top.cost).toLocaleString() + '/mo</span> at ' + (+st.vol).toLocaleString() + 'M tokens ' +
+        '<span style="color:var(--txt-3)">(~$' + top.blend.toFixed(2) + '/1M blended)</span></div>' +
+      '<div>runner-up <b>' + alt.c.name + '</b> · $' + Math.round(alt.cost).toLocaleString() + '/mo — that gap is your negotiation, not your destiny</div>' +
+      '<div style="margin-top:8px">' + top.c.note + '</div>' +
+      (sh.key
+        ? '<div style="margin-top:8px">still standing: <b>' + CAND.filter(function (c) { return c.shock[sh.key] >= 4; }).map(function (c) { return c.name; }).join(", ") + '</b></div>' +
+          '<div>estimated time to move production off the leader <b class="warn">~' + top.c.days + ' days</b>' +
+          ' <span style="color:var(--txt-3)">(eval re-run, legal, integration)</span></div>' +
+          '<div style="color:var(--txt-3)">→ keep a second source approved and warm, or the rollback is a project</div>'
+        : '<div style="margin-top:8px;color:var(--txt-3)">now break something →</div>');
+  }
+
+  profSel.addEventListener("change", function (e) { st.prof = e.target.value; applyProfile(PROFILES.filter(function (p) { return p.id === st.prof; })[0]); render(); });
+  [["ps-p", "price"], ["ps-q", "quality"], ["ps-c", "comp"], ["ps-e", "exit"]].forEach(function (pair) {
+    $(pair[0]).addEventListener("input", function () { st.w[pair[1]] = +this.value; render(); });
+  });
+  $("ps-v").addEventListener("input", function () { st.vol = +this.value; render(); });
+  Array.prototype.forEach.call(el.querySelectorAll(".ps-shock"), function (b) {
+    b.addEventListener("click", function () {
+      st.shock = b.getAttribute("data-shock");
+      Array.prototype.forEach.call(el.querySelectorAll(".ps-shock"), function (x) { x.className = "btn ghost ps-shock"; });
+      b.className = "btn ps-shock g";
+      render();
+    });
+  });
+
+  applyProfile(PROFILES.filter(function (p) { return p.id === st.prof; })[0]);
+  render();
+};
+</script>
+<script src="../template/widgets.js"></script>
+<script src="../template/deck.js"></script>
+</body>
+</html>

@@ -72,11 +72,11 @@ a.inl{color:var(--cyan)}
 <div class="wrap">
 
   <div class="kicker">interactive presentation kit · nocturne</div>
-  <h1>Five 30-minute talks,<br><span>built on one template</span></h1>
-  <p class="lede">Keyboard-driven slides with <b>live tools inside</b>: VRAM and fine-tune calculators, a tokeniser sandbox, a guardrail you try to beat, an animated agent graph. Speaker notes, a pacing timer, quiz scoring — and a print path that drops the whole deck into Canva.</p>
+  <h1>Nine 30-minute talks,<br><span>built on one template</span></h1>
+  <p class="lede">Keyboard-driven slides with <b>live tools inside</b>: VRAM and fine-tune calculators, a tokeniser sandbox, a guardrail you try to beat, an animated agent graph, an AI gateway that intercepts your attacks, a partner ranking you can shock with an export freeze, a diffusion fit-and-speed estimator, and a futures dial. Speaker notes, a pacing timer, quiz scoring — and a print path that drops the whole deck into Canva.</p>
   <div class="row">
-    <span class="pill">6 decks · <b>120 slides</b></span>
-    <span class="pill">5 live tools · <b>template/widgets.js</b></span>
+    <span class="pill">9 decks + template · <b>219 slides</b></span>
+    <span class="pill">9 live tools · <b>5 shared + 4 in-deck</b></span>
     <span class="pill">zero dependencies · <b>open a file, press ?</b></span>
     <span class="pill">16:9 · <b>1280 × 720</b></span>
     <span class="pill">budgeted to <b>28 min + 2</b> for questions</span>
@@ -130,10 +130,47 @@ a.inl{color:var(--cyan)}
       <div class="meta"><span>17 slides · runnable example</span><span class="go">present →</span></div>
     </a>
 
+
+    <a class="card" href="decks/06-ai-guardrails.html" style="--acc:var(--violet)">
+      <div class="no">06 · GUARDRAILS</div>
+      <h3>AI guardrails &amp; the inference control plane</h3>
+      <p>LiteLLM, Shield-Strai and the rest of the gateway stack, logging you can audit, and how an organisation keeps control of inference once agents are in the loop.</p>
+      <div class="sect"><b>Stops</b> · why the edge is the place → the gateway stack → guardrails, logging, audit → potential misuse → securing agents</div>
+      <div class="tags"><span class="tag">LiteLLM</span><span class="tag">Shield-Strai</span><span class="tag">AI gateway</span><span class="tag">OTel / audit</span><span class="tag">prompt injection</span><span class="tag tool">◆ gateway tier simulator</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>24 slides</span><span class="go">present →</span></div>
+    </a>
+
+    <a class="card" href="decks/07-partners-and-gateways.html" style="--acc:var(--green)">
+      <div class="no">07 · PARTNERS</div>
+      <h3>Which AI partner — and how you leave them</h3>
+      <p>Microsoft, Google, Anthropic, Mistral, AWS, Nvidia, Moonshot GLM, Qwen: who has the answer for a company, who offers a multi-model gateway, what it costs — OpenRouter and Fugu included — and the rollback you actually rehearse.</p>
+      <div class="sect"><b>Stops</b> · the field → money → gateways (OpenRouter, Fugu, self-built) → choosing → leaving</div>
+      <div class="tags"><span class="tag">frontier vs open</span><span class="tag">router economics</span><span class="tag">EU AI Act</span><span class="tag">exit plan</span><span class="tag tool">◆ partner &amp; rollback simulator</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>26 slides</span><span class="go">present →</span></div>
+    </a>
+
+    <a class="card" href="decks/08-generative-video-images.html" style="--acc:var(--magenta)">
+      <div class="no">08 · DIFFUSION</div>
+      <h3>Video &amp; image generation on your own hardware</h3>
+      <p>Wan 2.2, LTX-2.5, Hunyuan, MiniMax H3, Stable Diffusion, Ideogram, FLUX.2, Z-Image — measured seconds per clip on consumer cards, ComfyUI and WanGP, and training a video LoRA in ai-toolkit without burning it in.</p>
+      <div class="sect"><b>Stops</b> · video models → image models → speed on your GPU → ComfyUI &amp; WanGP → training a video LoRA</div>
+      <div class="tags"><span class="tag">Wan 2.2</span><span class="tag">LTX-2.5</span><span class="tag">FLUX.2</span><span class="tag">ComfyUI</span><span class="tag">ai-toolkit</span><span class="tag tool">◆ fit + speed estimator</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>24 slides</span><span class="go">present →</span></div>
+    </a>
+
+    <a class="card" href="decks/09-bio-robots-futures.html" style="--acc:var(--cyan)">
+      <div class="no">09 · MATTER</div>
+      <h3>Bio, robots, swarms — and the two futures</h3>
+      <p>What foundation models actually changed in DNA and protein work, how they drive robots and drone swarms, and the dystopia / utopia ledger — with the controls that decide which one you get.</p>
+      <div class="sect"><b>Stops</b> · biology &amp; DNA → robots → drone swarms → the two futures → what decides it</div>
+      <div class="tags"><span class="tag">AlphaFold / Evo 2</span><span class="tag">VLA robots</span><span class="tag">swarm control</span><span class="tag">AI Act</span><span class="tag">DoD 3000.09</span><span class="tag tool">◆ futures dial</span><span class="tag dur">30 min</span></div>
+      <div class="meta"><span>25 slides</span><span class="go">present →</span></div>
+    </a>
+
     <a class="card" href="template/showcase.html" style="--acc:var(--txt-2)">
       <div class="no">00 · TEMPLATE</div>
       <h3>Nocturne — layouts &amp; the tool layer</h3>
-      <p>Every layout used by the five decks, plus the widget contract for building new live tools. Start here to author deck 06.</p>
+      <p>Every layout used by the nine decks, plus the widget contract for building new live tools. Start here to author deck 10.</p>
       <div class="sect"><b>Contents</b> · title / agenda / divider / bullets / tables / code / quote / quiz / poll / tool widgets / end</div>
       <div class="tags"><span class="tag">deck.css</span><span class="tag">deck.js</span><span class="tag">widgets.js</span><span class="tag tool">◆ live examples</span><span class="tag dur">10 min tour</span></div>
       <div class="meta"><span>16 slides</span><span class="go">open →</span></div>
@@ -164,7 +201,7 @@ a.inl{color:var(--cyan)}
 
   <h2>Files</h2>
   <div class="sect" style="font-size:14px;line-height:2">
-    <code>decks/</code> the five talks &nbsp;·&nbsp; <code>template/deck.css</code> theme + layouts &nbsp;·&nbsp; <code>template/deck.js</code> navigation, timer, quizzes, widget bootstrap &nbsp;·&nbsp; <code>template/widgets.js</code> the five production tools &nbsp;·&nbsp; <code>template/showcase.html</code> layout + tool-layer reference &nbsp;·&nbsp; <code>research/notes/</code> per-topic research with sources &nbsp;·&nbsp; <code>research/examples/deep_research_swarm.py</code> runnable agent-graph example &nbsp;·&nbsp; <code>README.md</code> authoring guide
+    <code>decks/</code> the nine talks &nbsp;·&nbsp; <code>template/deck.css</code> theme + layouts &nbsp;·&nbsp; <code>template/deck.js</code> navigation, timer, quizzes, widget bootstrap &nbsp;·&nbsp; <code>template/widgets.js</code> the five shared production tools (decks 06–09 each carry their own inline widget) &nbsp;·&nbsp; <code>template/showcase.html</code> layout + tool-layer reference &nbsp;·&nbsp; <code>research/notes/</code> per-topic research with sources &nbsp;·&nbsp; <code>research/examples/deep_research_swarm.py</code> runnable agent-graph example &nbsp;·&nbsp; <code>README.md</code> authoring guide
   </div>
 
   <footer>
